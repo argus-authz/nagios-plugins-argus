@@ -117,7 +117,7 @@ def setup_option_parser():
                             "--cert",
                            dest="cert",
                            help="The SSL client certificate. [default: %default]",
-                           default="/etc/grid-security/hostcert.pem ")
+                           default="/etc/grid-security/hostcert.pem" )
     
     ssl_options.add_option("-k",
                             "--key",
