@@ -1,4 +1,4 @@
-#!/usr/bin/env/python
+#!/usr/bin/env python
 #############################################################################
 # Copyright (c) Italian Grid Initiative 2011.
 #
@@ -168,8 +168,15 @@ def main():
     
     except URLError, e:
         nagios_critical("Error contacting remote server: %s: %s" % (contact_string, e))
-        
-    #print f.read(100)
+     
+    b = False
+    for line in f:
+        if "Status: OK2" in line:
+            b = True
+    if b != True:
+        nagios_critical("the returned String did not contain the search string, search string is: \"Status: OK\"")
+
+    #print f.read()
         
 
 if __name__ == '__main__':
