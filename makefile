@@ -1,6 +1,8 @@
 
+INSTALLDIR = $(DESTDIR)/usr/libexec/grid-monitoring/probes/
 
 install:
-	cp src/* /usr/libexec/grid-monitoring/probes/
-	chown nagios:nagios /usr/libexec/grid-monitoring/probes/nagios-plugin-argus*
-	chmod 750 /usr/libexec/grid-monitoring/probes/nagios-plugin-argus*
+	mkdir -p $(INSTALLDIR)
+	cp src/* $(INSTALLDIR)
+	chown casutt:middle $(INSTALLDIR)/nagios-plugin-argus*
+	chmod 750 $(INSTALLDIR)/nagios-plugin-argus*
