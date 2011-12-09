@@ -41,7 +41,7 @@ OK       = 0
 CRITICAL = 2
 UNKNOWN  = 3
 
-contact_string_template = "https://${hostname}:${port}/authz"
+contact_string_template = "https://${hostname}:${port}/status"
 usage = "usage %prog [options]"
 
 def nagios_exit(exit_code, msg):
@@ -164,12 +164,12 @@ def main():
         f = urllib2.urlopen(contact_string)
     
     except HTTPError, e:
-        nagios_critical("The server could not fulfill the request for %s" % (e))
+        nagios_critical("The server could not fulfill the request. Error message: %s" % (e))
     
     except URLError, e:
         nagios_critical("Error contacting remote server: %s: %s" % (contact_string, e))
         
-    print f
+    #print f.read(100)
         
 
 if __name__ == '__main__':
