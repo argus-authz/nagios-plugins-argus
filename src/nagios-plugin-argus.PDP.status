@@ -103,6 +103,13 @@ def setup_option_parser():
                       dest="timeout",
                       help="The TCP timeout for the HTTPS connection.",
                       default="20")
+                      
+     parser.add_option("-v",
+                      "--verbose",
+                      action="store_true",
+                      dest="verbose",
+                      help="verbose mode",
+                      default=False)
     
     ssl_options = OptionGroup(parser,"SSL options", "These options are used to set the SSL certificate to be used to authenticate with VOMS Admin.")
     
@@ -162,6 +169,9 @@ def main():
     urllib2.install_opener(opener)
     
     try:
+        if options.verbose:
+            print ""
+            print "now trying to get a response from %s..." % contact_string
         f = urllib2.urlopen(contact_string)
     
     except HTTPError, e:
@@ -177,7 +187,11 @@ def main():
     if b != True:
         nagios_critical("the returned String did not contain the search string, the search string is: \"Status: OK\"")
 
-    #print f.read()
+    
+    if options.verbose:
+        print ""
+        print "the recieved output is:"
+        print f.read()
         
 
 if __name__ == '__main__':
