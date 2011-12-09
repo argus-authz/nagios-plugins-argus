@@ -80,23 +80,23 @@ def sig_handler(signum, frame):
         nagios_unknown("SIGTERM received.")
 
 def setup_option_parser():
-    parser = OptionParser(version="nagios-plugin-argus.PEP.status v. %s" % __version__)
+    parser = OptionParser(version="nagios-plugin-argus.PAP.status v. %s" % __version__)
     
     parser.add_option("-H",
                       "--hostname",
                       dest="hostname",
-                      help="The host where the PEP-Server is running.")
+                      help="The host where the PAP-Server is running.")
     
     parser.add_option("-p",
                       "--port",
                       dest="port",
-                      help="The port where PEP Server is listening.",
-                      default="8154")
+                      help="The port where PAP Server is listening.",
+                      default="8150")
                       
     parser.add_option("-u",
                       "--url",
                       dest="url",
-                      help="The complete url where the PEP Server responds.")
+                      help="The complete url where the PAP Server responds.")
     
     parser.add_option("-t",
                       "--timeout",
