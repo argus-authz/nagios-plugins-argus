@@ -36,13 +36,13 @@ import httplib
 import socket
 from urllib2 import HTTPError, URLError
  
-__version__ = "1.0"
+__version__ = "1.0.0"
 
 OK       = 0
 CRITICAL = 2
 UNKNOWN  = 3
 
-contact_string_template = "https://${hostname}:${port}/status"
+url_template = "https://${hostname}:${port}/pap/status"
 usage = "usage %prog [options]"
 
 def nagios_exit(exit_code, msg):
@@ -157,9 +157,9 @@ def main():
         optdict = {'hostname':options.hostname,
                 'port': options.port}
     
-        contact_string = Template(contact_string_template).safe_substitute(optdict)
+        url = Template(url_template).safe_substitute(optdict)
     else:
-        contact_string = options.url
+        url = options.url
     
     cert_handler = HTTPSClientAuthHandler(key=options.key, 
                                         cert=options.cert,
@@ -170,18 +170,16 @@ def main():
     
     try:
         if options.verbose:
-            print "Contacting %s..." % contact_string
-        f = urllib2.urlopen(contact_string)
+            print "Contacting %s..." % url
+        f = urllib2.urlopen(url)
     
     except HTTPError, e:
-        nagios_critical("Error: %s" % (e))
+        nagios_critical("Error: %s: %s" % (url, e))
     
     except URLError, e:
-        nagios_critical("Error: %s: %s" % (contact_string, e))
+        nagios_critical("Error: %s: %s" % (url, e))
      
     b = False
-    if options.verbose:
-        print "the recieved output is:"
     for line in f:
         if options.verbose:
             print line ,
