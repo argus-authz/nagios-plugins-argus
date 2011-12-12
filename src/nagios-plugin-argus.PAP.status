@@ -85,18 +85,18 @@ def setup_option_parser():
     parser.add_option("-H",
                       "--hostname",
                       dest="hostname",
-                      help="The host where the PAP-Server is running.")
+                      help="The hostname of the PAP service.")
     
     parser.add_option("-p",
                       "--port",
                       dest="port",
-                      help="The port where PAP Server is listening. [default: %default]",
+                      help="The port of the PAP service. [default: %default]",
                       default="8150")
                       
     parser.add_option("-u",
                       "--url",
                       dest="url",
-                      help="The complete url where the PAP Server responds.")
+                      help="The status endpoint URL of the PAP service.")
     
     parser.add_option("-t",
                       "--timeout",
@@ -111,7 +111,7 @@ def setup_option_parser():
                       help="verbose mode [default: %default]",
                       default=False)
     
-    ssl_options = OptionGroup(parser,"SSL options", "These options are used to set the SSL certificate to be used to authenticate with VOMS Admin.")
+    ssl_options = OptionGroup(parser,"SSL options", "These options are used to set the SSL certificate to be used to authenticate with the PAP service.")
     
     ssl_options.add_option("-c",
                             "--cert",
@@ -151,7 +151,7 @@ def main():
         nagios_unknown("Options -u and {-H and -p} are mutually exclusive")
         
     if not options.url and not options.hostname and not options.url:
-        nagios_unknown("Please specify either a whole Url using the -u option or a set of hostname and port using the -H and -u options")
+        nagios_unknown("Please specify either a whole URL using the -u option or a set of hostname and port using the -H and -u options")
        
     if options.port and options.hostname:
         optdict = {'hostname':options.hostname,
