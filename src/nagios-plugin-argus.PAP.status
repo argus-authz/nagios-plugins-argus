@@ -58,11 +58,20 @@ def nagios_critical(msg):
 def nagios_unknown(msg):
     nagios_exit(UNKNOWN, msg)
 
+def file_exists(file):
+    try:
+        open(file)
+    except IOError as e:
+        nagios_critical("Error: %s does not exist or is not readable" % (file))
+
+
 class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
     
     def __init__(self, key, cert, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
         urllib2.HTTPSHandler.__init__(self)
+        file_exists(key)
         self.key = key
+	file_exists(cert)
         self.cert = cert
         self.timeout = timeout
         
@@ -81,7 +90,7 @@ def sig_handler(signum, frame):
 
 def setup_option_parser():
     parser = OptionParser(version="nagios-plugin-argus.PAP.status v. %s" % __version__)
-    
+   
     parser.add_option("-H",
                       "--hostname",
                       dest="hostname",
@@ -145,14 +154,14 @@ def main():
     (options, args) = parser.parse_args()
     
     if options.hostname and not options.port:
-        parser.error("option -H requires option -p and vice versa. If you want to use a complete URL use option -u")
-    
+        parser.error("-H HOSTNAME requires -p PORT and vice versa. Complete URL can be set using -u URL")
+
     if options.url and (options.hostname and options.port):
-        nagios_unknown("Options -u and {-H and -p} are mutually exclusive")
-        
+        nagios_unknown("Options -u URL and {-H HOSTNAME and -p PORT} are mutually exclusive")
+
     if not options.url and not options.hostname and not options.url:
-        nagios_unknown("Please specify either a whole URL using the -u option or a set of hostname and port using the -H and -u options")
-       
+        nagios_unknown("Specify either a -u URL or a -H HOSTNAME and a -p PORT or read the help (-h)")
+ 
     if options.port and options.hostname:
         optdict = {'hostname':options.hostname,
                 'port': options.port}

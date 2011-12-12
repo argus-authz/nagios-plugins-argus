@@ -58,14 +58,23 @@ def nagios_critical(msg):
 def nagios_unknown(msg):
     nagios_exit(UNKNOWN, msg)
 
+def file_exists(file):
+    try:
+        open(file)
+    except IOError as e:
+        nagios_critical("Error: %s does not exist or is not readable" % (file))
+
+
 class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
-    
+
     def __init__(self, key, cert, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
         urllib2.HTTPSHandler.__init__(self)
+        file_exists(key)
         self.key = key
+        file_exists(cert)
         self.cert = cert
         self.timeout = timeout
-        
+ 
     def https_open(self, req):
         return self.do_open(self.getConnection, req)
     
@@ -85,18 +94,18 @@ def setup_option_parser():
     parser.add_option("-H",
                       "--hostname",
                       dest="hostname",
-                      help="The host where the PDP-Server is running.")
+                      help="The hostname of the PDP service.")
     
     parser.add_option("-p",
                       "--port",
                       dest="port",
-                      help="The port where PDP Server is listening. [default: %default]",
+                      help="The port of the PDP service. [default: %default]",
                       default="8152")
                       
     parser.add_option("-u",
                       "--url",
                       dest="url",
-                      help="The complete url where the PDP Server responds.")
+                      help="The status endpoint URL of the PDP service.")
     
     parser.add_option("-t",
                       "--timeout",
@@ -111,13 +120,13 @@ def setup_option_parser():
                       help="verbose mode [default: %default]",
                       default=False)
     
-    ssl_options = OptionGroup(parser,"SSL options", "These options are used to set the SSL certificate to be used to authenticate with VOMS Admin.")
+    ssl_options = OptionGroup(parser,"SSL options", "These options are used to set the SSL certificate to be used to authenticate with PDP service.")
     
     ssl_options.add_option("-c",
                             "--cert",
                            dest="cert",
                            help="The SSL client certificate. [default: %default]",
-                           default="/etc/grid-security/hostcert.pem" )
+                           default="/etc/grid-security/hostcert.pem")
     
     ssl_options.add_option("-k",
                             "--key",
@@ -145,14 +154,14 @@ def main():
     (options, args) = parser.parse_args()
     
     if options.hostname and not options.port:
-        parser.error("option -H requires option -p and vice versa. If you want to use a complete URL use option -u")
-    
+        parser.error("-H HOSTNAME requires -p PORT and vice versa. Complete URL can be set using -u URL")
+
     if options.url and (options.hostname and options.port):
-        nagios_unknown("Options -u and {-H and -p} are mutually exclusive")
-        
+        nagios_unknown("Options -u URL and {-H HOSTNAME and -p PORT} are mutually exclusive")
+
     if not options.url and not options.hostname and not options.url:
-        nagios_unknown("Please specify either a whole Url using the -u option or a set of hostname and port using the -H and -u options")
-       
+        nagios_unknown("Specify either a -u URL or a -H HOSTNAME and a -p PORT or read the help (-h)")
+ 
     if options.port and options.hostname:
         optdict = {'hostname':options.hostname,
                 'port': options.port}
