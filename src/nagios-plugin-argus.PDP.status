@@ -110,7 +110,7 @@ def setup_option_parser():
     parser.add_option("-u",
                       "--url",
                       dest="url",
-                      help="The status endpoint URL of the PDP service.")
+                      help="The status endpoint URL of the PDP service. Example: https://hostname:8152/status")
     
     parser.add_option("-t",
                       "--timeout",
