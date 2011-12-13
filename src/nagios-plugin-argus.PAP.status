@@ -89,7 +89,7 @@ def sig_handler(signum, frame):
         nagios_unknown("SIGTERM received.")
 
 def setup_option_parser():
-    parser = OptionParser(version="nagios-plugin-argus.PAP.status v. %s" % __version__)
+    parser = OptionParser(version="nagios-plugin-argus.PAP.status v.%s" % __version__)
    
     parser.add_option("-H",
                       "--hostname",
@@ -105,7 +105,7 @@ def setup_option_parser():
     parser.add_option("-u",
                       "--url",
                       dest="url",
-                      help="The status endpoint URL of the PAP service.")
+                      help="The status endpoint URL of the PAP service. Example: https://hostname:8150/pap/status")
     
     parser.add_option("-t",
                       "--timeout",
@@ -154,17 +154,17 @@ def main():
     (options, args) = parser.parse_args()
     
     if options.hostname and not options.port:
-        parser.error("-H HOSTNAME requires -p PORT and vice versa. Complete URL can be set using -u URL")
+        parser.error("Option -H HOSTNAME requires option -p PORT and vice versa. Complete URL can be set using option -u URL")
 
     if options.url and (options.hostname and options.port):
         nagios_unknown("Options -u URL and {-H HOSTNAME and -p PORT} are mutually exclusive")
 
     if not options.url and not options.hostname and not options.url:
-        nagios_unknown("Specify either a -u URL or a -H HOSTNAME and a -p PORT or read the help (-h)")
+        nagios_unknown("Specify either option -u URL or options -H HOSTNAME and -p PORT or read the help (-h)")
  
     if options.port and options.hostname:
-        optdict = {'hostname':options.hostname,
-                'port': options.port}
+        optdict = {'hostname': options.hostname,
+                   'port': options.port}
     
         url = Template(url_template).safe_substitute(optdict)
     else:
@@ -188,13 +188,13 @@ def main():
     except URLError, e:
         nagios_critical("Error: %s: %s" % (url, e))
      
-    b = False
+    status_ok = False
     for line in f:
         if options.verbose:
             print line ,
         if "Status: OK" in line:
-            b = True
-    if b != True:
+            status_ok = True
+    if not status_ok:
         nagios_critical("\"Status: OK\" not found.")
 
 
