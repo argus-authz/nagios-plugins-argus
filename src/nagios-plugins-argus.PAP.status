@@ -196,6 +196,8 @@ def main():
             status_ok = True
     if not status_ok:
         nagios_critical("\"Status: OK\" not found.")
+    else:
+        nagios_ok("Status OK")
 
 
 if __name__ == '__main__':
