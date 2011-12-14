@@ -19,7 +19,11 @@
 #############################################################################
 
 INSTALLDIR = /usr/libexec/grid-monitoring/probes
+NAMESPACE = nagios-plugins-argus
+
+all: install
 
 install:
-	install -m 750 -d $(DESTDIR)$(INSTALLDIR)
-	install -m 750 src/* $(DESTDIR)$(INSTALLDIR)
+	@echo "Installing in $(INSTALLDIR)/$(NAMESPACE)..."
+	install -d $(DESTDIR)$(INSTALLDIR)/$(NAMESPACE)
+	install -m 0750 src/nagios-plugins-argus.* $(DESTDIR)$(INSTALLDIR)/$(NAMESPACE)
