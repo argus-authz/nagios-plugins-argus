@@ -1,0 +1,204 @@
+#!/usr/bin/env python
+#############################################################################
+# Copyright (c) Members of the EGEE Collaboration. 2006-2010.
+# See http://www.eu-egee.org/partners/ for details on the copyright holders.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Authors:
+#     Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it
+#     Joel Casutt     - joel.casutt@switch.ch
+#############################################################################
+'''
+Created on 9/dez/2011
+
+@author: andreaceccanti
+@author: joelcasutt
+'''
+
+from optparse import OptionParser, OptionGroup
+
+from string import Template
+from sys import stderr, exit
+import signal
+import urllib2
+import httplib
+import socket
+from urllib2 import HTTPError, URLError
+ 
+__version__ = "1.0.0"
+
+OK       = 0
+CRITICAL = 2
+UNKNOWN  = 3
+
+url_template = "https://${hostname}:${port}/pap/status"
+usage = "usage %prog [options]"
+
+def nagios_exit(exit_code, msg):
+    print msg
+    exit(exit_code)
+
+def nagios_ok(msg):
+    nagios_exit(OK, msg)
+
+def nagios_critical(msg):
+    nagios_exit(CRITICAL, msg)
+
+def nagios_unknown(msg):
+    nagios_exit(UNKNOWN, msg)
+
+def file_exists(file):
+    try:
+        open(file)
+    except IOError as e:
+        nagios_critical("Error: %s does not exist or is not readable" % (file))
+
+
+class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
+    
+    def __init__(self, key, cert, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
+        urllib2.HTTPSHandler.__init__(self)
+        file_exists(key)
+        self.key = key
+	file_exists(cert)
+        self.cert = cert
+        self.timeout = timeout
+        
+    def https_open(self, req):
+        return self.do_open(self.getConnection, req)
+    
+    def getConnection(self, host, timeout):
+        return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
+    
+
+def sig_handler(signum, frame):
+    if signum == signal.SIGALRM:
+        nagios_unknown("Received timeout while fetching results.")
+    elif signum == signal.SIGTERM:
+        nagios_unknown("SIGTERM received.")
+
+def setup_option_parser():
+    parser = OptionParser(version="nagios-plugin-argus.PAP.status v.%s" % __version__)
+   
+    parser.add_option("-H",
+                      "--hostname",
+                      dest="hostname",
+                      help="The hostname of the PAP service.")
+    
+    parser.add_option("-p",
+                      "--port",
+                      dest="port",
+                      help="The port of the PAP service. [default: %default]",
+                      default="8150")
+                      
+    parser.add_option("-u",
+                      "--url",
+                      dest="url",
+                      help="The status endpoint URL of the PAP service. Example: https://hostname:8150/pap/status")
+    
+    parser.add_option("-t",
+                      "--timeout",
+                      dest="timeout",
+                      help="The TCP timeout for the HTTPS connection. [default: %default]",
+                      default="20")
+                      
+    parser.add_option("-v",
+                      "--verbose",
+                      action="store_true",
+                      dest="verbose",
+                      help="verbose mode [default: %default]",
+                      default=False)
+    
+    ssl_options = OptionGroup(parser,"SSL options", "These options are used to set the SSL certificate to be used to authenticate with the PAP service.")
+    
+    ssl_options.add_option("-c",
+                            "--cert",
+                           dest="cert",
+                           help="The SSL client certificate. [default: %default]",
+                           default="/etc/grid-security/hostcert.pem")
+    
+    ssl_options.add_option("-k",
+                            "--key",
+                           dest="key",
+                           help="The private key (the key must be unencrypted). [default: %default]",
+                           default="/etc/grid-security/hostkey.pem")
+    
+    ssl_options.add_option("--capath", 
+                           dest="capath", 
+                           help="The directory where trust anchors are stored on the system. [default: %default]",
+                           default="/etc/grid-security/certificates")
+    
+    parser.add_option_group(ssl_options)
+    
+    return parser
+
+
+def main():
+    
+    ## Setup signal handlers
+    signal.signal(signal.SIGALRM, sig_handler)
+    signal.signal(signal.SIGTERM, sig_handler)
+    
+    parser = setup_option_parser()
+    (options, args) = parser.parse_args()
+    
+    if options.hostname and not options.port:
+        parser.error("Option -H HOSTNAME requires option -p PORT and vice versa. Complete URL can be set using option -u URL")
+
+    if options.url and (options.hostname and options.port):
+        nagios_unknown("Options -u URL and {-H HOSTNAME and -p PORT} are mutually exclusive")
+
+    if not options.url and not options.hostname and not options.url:
+        nagios_unknown("Specify either option -u URL or options -H HOSTNAME and -p PORT or read the help (-h)")
+ 
+    if options.port and options.hostname:
+        optdict = {'hostname': options.hostname,
+                   'port': options.port}
+    
+        url = Template(url_template).safe_substitute(optdict)
+    else:
+        url = options.url
+    
+    cert_handler = HTTPSClientAuthHandler(key=options.key, 
+                                        cert=options.cert,
+                                        timeout=options.timeout) 
+    
+    opener = urllib2.build_opener(cert_handler)
+    urllib2.install_opener(opener)
+    
+    try:
+        if options.verbose:
+            print "Contacting %s..." % url
+        f = urllib2.urlopen(url)
+    
+    except HTTPError, e:
+        nagios_critical("Error: %s: %s" % (url, e))
+    
+    except URLError, e:
+        nagios_critical("Error: %s: %s" % (url, e))
+     
+    status_ok = False
+    for line in f:
+        if options.verbose:
+            print line ,
+        if "Status: OK" in line:
+            status_ok = True
+    if not status_ok:
+        nagios_critical("\"Status: OK\" not found.")
+    else:
+        nagios_ok("Status OK")
+
+
+if __name__ == '__main__':
+    main()
