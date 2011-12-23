@@ -40,7 +40,7 @@ __version__ = "1.0.0"
 
 # By default the PDP doesn't use HTTPS with client authentication
 # disable optional SSL options (--cert, --key, --capath)
-__enable_https_client_authentication__ = False
+__enable_https_client_authentication = False
 
 OK       = 0
 WARNING  = 1
@@ -125,7 +125,7 @@ def setup_option_parser():
                       help="verbose mode [default: %default]",
                       default=False)
     
-    if __enable_https_client_authentication__:
+    if __enable_https_client_authentication:
         ssl_options = OptionGroup(parser,"SSL options", "These options are used to set the SSL certificate to be used to authenticate with PDP service.")
         ssl_options.add_option("-c",
                                "--cert",
@@ -171,7 +171,7 @@ def main():
     else:
         url = options.url
     
-    if __enable_https_client_authentication__:
+    if __enable_https_client_authentication:
         cert_handler = HTTPSClientAuthHandler(key=options.key, 
                                               cert=options.cert,
                                               timeout=options.timeout) 
