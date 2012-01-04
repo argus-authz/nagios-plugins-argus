@@ -25,36 +25,36 @@ Created on 9/dez/2011
 @author: andreaceccanti
 @author: joelcasutt
 '''
-
-import urllib2
-import httplib
-import socket
+from Status import ArgusStatus
+import signal
 
 __version__ = "1.0.0"
 
-class ArgusConnection( urllib2.HTTPSHandler ):
+class ArgusCurrentStatus( ArgusStatus ):
 
-    key = "/etc/grid-security/hostkey.pem"
-    cert = "/etc/grid-security/hostcert.pem"
+    __enable_https_client_authentication = False
+
+    def __init__( self, clientAuth ):
+        super(ArgusCurrentStatus, self).__init__(clientAuth)
+        self.__enable_https_client_authentication = clientAuth
+        
+    def getStatus( self ):
+        d = ArgusStatus.getStatus( self )
+        if d['Status'] == 'OK':
+            ArgusStatus.nagios_ok(self, "Status Ok")
+        else:
+            ArgusStatus.nagios_critical(self, "\"Status: OK\" not found.")
+        
+def main():
+    handler = ArgusCurrentStatus(False)
     
-
-    def __init__(self, key, cert, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
-        urllib2.HTTPSHandler.__init__(self)
-        self.file_exists(key)
-        self.key = key
-        self.file_exists(cert)
-        self.cert = cert
-        self.timeout = timeout
- 
-    def https_open(self, req):
-        return self.do_open(self.getConnection, req)
+    signal.signal(signal.SIGALRM, handler.sig_handler)
+    signal.signal(signal.SIGTERM, handler.sig_handler)
     
-    def getConnection(self, host, timeout):
-        return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
-
-    def file_exists(self, file):
-        try:
-            open(file)
-        except IOError as e:
-           print "Error: %s does not exist or is not readable" % (file)
-           exit(2)
+    handler.readOptions()
+    
+    status = handler.getStatus()
+    print status.items()
+    
+if __name__ == '__main__':
+    main()

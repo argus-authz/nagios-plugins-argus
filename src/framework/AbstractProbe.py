@@ -66,15 +66,20 @@ class ArgusAbstractProbe( object ):
     __url_template = "https://${hostname}:${port}/status"
     usage = "usage %prog [options]"
     optionParser = ""
+    options = ""
+    args = ""
+    url = ""
     
     
     # constructor
-    def __init__( self ):
+    def __init__( self, clientAuth ):
         self.optionParser = OptionParser(version="%s v.%s" % (inspect.getfile(inspect.currentframe()), __version__))
+        __enable_https_client_authentication = clientAuth
     
     # getters (and setters) for the default private variables and constants  
     def getDefaultPort( self ):
-        raise NotImplementedError( "Should have overridden the DEFAULT_PORT" )
+        return 8154
+        #raise NotImplementedError( "Should have overridden the DEFAULT_PORT" )
         
     def getDefaultTimeout( self ):
         return self.DEFAULT_TIMEOUT
@@ -86,7 +91,8 @@ class ArgusAbstractProbe( object ):
         return self.PICKLE_DIR
     
     def getPickleFile( self ):
-        raise NotImplementedError( "Should have overridden the pickle_file" )
+        return pfile
+        #raise NotImplementedError( "Should have overridden the pickle_file" )
         
     def setPickleFile( self, pickle_file ):
         self.__pickle_file = pickle_file
@@ -123,18 +129,18 @@ class ArgusAbstractProbe( object ):
         optionParser.add_option("-H",
                       "--hostname",
                       dest="hostname",
-                      help="The hostname of the PAP service.")
+                      help="The hostname of the service.")
     
         optionParser.add_option("-p",
                       "--port",
                       dest="port",
-                      help="The port of the PAP service. [default: %default]",
+                      help="The port of the service. [default: %default]",
                       default = self.getDefaultPort())
                       
         optionParser.add_option("-u",
                       "--url",
                       dest="url",
-                      help="The status endpoint URL of the PAP service. Example: https://hostname:8150/pap/status")
+                      help="The status endpoint URL of the service. Example: https://hostname:8150/status")
     
         optionParser.add_option("-t",
                       "--timeout",
@@ -149,7 +155,7 @@ class ArgusAbstractProbe( object ):
                       help="verbose mode [default: %default]",
                       default = self.getDefaultVerbosity())
                       
-        # memory_options = OptionGroup(optionParser, "Memory options", "These options are used to set the nagios-limits for the memory.")
+#       memory_options = OptionGroup(optionParser, "Memory options", "These options are used to set the nagios-limits for the memory.")
 #         memory_options.add_option("-w", 
 #                           "--warning",
 #                           dest = "mem_warn",
@@ -193,23 +199,26 @@ class ArgusAbstractProbe( object ):
         
             optionParser.add_option_group(ssl_options)
     
-        (options, args) = optionParser.parse_args()
+        (self.options, self.args) = optionParser.parse_args()
         
-        if options.hostname and not options.port:
+        
+        if self.options.hostname and not self.options.port:
             optionParser.error("Option -H HOSTNAME requires option -p PORT and vice versa. Complete URL can be set using option -u URL")
 
-        if options.url and (options.hostname and options.port):
+        if self.options.url and (self.options.hostname and self.options.port):
             self.nagios_unknown("Options -u URL and {-H HOSTNAME and -p PORT} are mutually exclusive")
 
-        if not options.url and not options.hostname and not options.url:
+        if not self.options.url and not self.options.hostname and not self.options.url:
             self.nagios_unknown("Specify either option -u URL or options -H HOSTNAME and -p PORT or read the help (-h)")
 
-        if options.port and options.hostname:
-            optdict = {'hostname': options.hostname,
-                       'port': options.port}
-            url = Template(self.__url_template).safe_substitute(optdict)
+        if self.options.port and self.options.hostname:
+            optdict = {'hostname': self.options.hostname,
+                       'port': self.options.port}
+            self.url = Template(self.__url_template).safe_substitute(optdict)
         else:
-            url = options.url
+            self.url = self.options.url
+            
+            
             
     def sig_handler(signum, frame):
         if signum == signal.SIGALRM:
