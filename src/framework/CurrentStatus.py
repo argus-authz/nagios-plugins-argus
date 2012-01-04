@@ -16,27 +16,21 @@
 # limitations under the License.
 #
 # Authors:
-#     Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it
 #     Joel Casutt     - joel.casutt@switch.ch
 #############################################################################
 '''
-Created on 9/dez/2011
+Created on 4/jan/2012
 
-@author: andreaceccanti
 @author: joelcasutt
 '''
 from Status import ArgusStatus
-import signal
 
 __version__ = "1.0.0"
 
 class ArgusCurrentStatus( ArgusStatus ):
 
-    __enable_https_client_authentication = False
-
     def __init__( self, clientAuth ):
         super(ArgusCurrentStatus, self).__init__(clientAuth)
-        self.__enable_https_client_authentication = clientAuth
         
     def getStatus( self ):
         d = ArgusStatus.getStatus( self )
@@ -44,17 +38,3 @@ class ArgusCurrentStatus( ArgusStatus ):
             ArgusStatus.nagios_ok(self, "Status Ok")
         else:
             ArgusStatus.nagios_critical(self, "\"Status: OK\" not found.")
-        
-def main():
-    handler = ArgusCurrentStatus(False)
-    
-    signal.signal(signal.SIGALRM, handler.sig_handler)
-    signal.signal(signal.SIGTERM, handler.sig_handler)
-    
-    handler.readOptions()
-    
-    status = handler.getStatus()
-    print status.items()
-    
-if __name__ == '__main__':
-    main()

@@ -16,18 +16,15 @@
 # limitations under the License.
 #
 # Authors:
-#     Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it
 #     Joel Casutt     - joel.casutt@switch.ch
 #############################################################################
 '''
-Created on 9/dez/2011
+Created on 4/jan/2012
 
-@author: andreaceccanti
 @author: joelcasutt
 '''
 from AbstractProbe import ArgusAbstractProbe
 from Connection import ArgusConnection
-import signal
 from urllib2 import HTTPError, URLError
 import urllib2
 
@@ -35,22 +32,17 @@ __version__ = "1.0.0"
 
 class ArgusStatus( ArgusAbstractProbe ):
 
-    __enable_https_client_authentication = False
-
     def __init__( self, clientAuth ):
         super(ArgusStatus, self).__init__(clientAuth)
         self.__enable_https_client_authentication = clientAuth
         
     def getStatus( self ):
-    
         if self.__enable_https_client_authentication:
             cert_handler = ArgusConnection(key=self.options.key, 
-                                                cert=self.options.cert,
-                                                timeout=self.options.timeout) 
-        
+                                           cert=self.options.cert,
+                                           timeout=self.options.timeout) 
             opener = urllib2.build_opener(cert_handler)
             urllib2.install_opener(opener)
-        
         try:
             if self.options.verbose:
                 print "Contacting %s..." % self.url
@@ -59,24 +51,11 @@ class ArgusStatus( ArgusAbstractProbe ):
             self.nagios_critical("Error: %s: %s" % (self.url, e))   
         except URLError, e:
             self.nagios_critical("Error: %s: %s" % (self.url, e))
-            
         d = dict()
         for line in f:
             (key, value) = line.rsplit('\n')[0].split(": ")
             d[key] = value
-            
         return d
-    
-def main():
-    handler = ArgusStatus(False)
-    
-    signal.signal(signal.SIGALRM, handler.sig_handler)
-    signal.signal(signal.SIGTERM, handler.sig_handler)
-    
-    handler.readOptions()
-    
-    status = handler.getStatus()
-    print status.items()
-    
-if __name__ == '__main__':
-    main()
+        
+    def getPickleFile( self ):
+        print "no pickle-file needed for this service (Status)"

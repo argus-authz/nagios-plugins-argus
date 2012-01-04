@@ -16,16 +16,13 @@
 # limitations under the License.
 #
 # Authors:
-#     Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it
 #     Joel Casutt     - joel.casutt@switch.ch
 #############################################################################
 '''
-Created on 9/dez/2011
+Created on 4/jan/2012
 
-@author: andreaceccanti
 @author: joelcasutt
 '''
-
 from optparse import OptionParser, OptionGroup
 from string import Template
 from sys import stderr, exit
@@ -69,17 +66,15 @@ class ArgusAbstractProbe( object ):
     options = ""
     args = ""
     url = ""
-    
-    
+     
     # constructor
     def __init__( self, clientAuth ):
         self.optionParser = OptionParser(version="%s v.%s" % (inspect.getfile(inspect.currentframe()), __version__))
-        __enable_https_client_authentication = clientAuth
+        self.__enable_https_client_authentication = clientAuth
     
     # getters (and setters) for the default private variables and constants  
     def getDefaultPort( self ):
-        return 8154
-        #raise NotImplementedError( "Should have overridden the DEFAULT_PORT" )
+        raise NotImplementedError( "Should have overridden the DEFAULT_PORT" )
         
     def getDefaultTimeout( self ):
         return self.DEFAULT_TIMEOUT
@@ -91,8 +86,7 @@ class ArgusAbstractProbe( object ):
         return self.PICKLE_DIR
     
     def getPickleFile( self ):
-        return pfile
-        #raise NotImplementedError( "Should have overridden the pickle_file" )
+        raise NotImplementedError( "Should have overridden the pickle_file" )
         
     def setPickleFile( self, pickle_file ):
         self.__pickle_file = pickle_file
@@ -154,20 +148,6 @@ class ArgusAbstractProbe( object ):
                       dest="verbose",
                       help="verbose mode [default: %default]",
                       default = self.getDefaultVerbosity())
-                      
-#       memory_options = OptionGroup(optionParser, "Memory options", "These options are used to set the nagios-limits for the memory.")
-#         memory_options.add_option("-w", 
-#                           "--warning",
-#                           dest = "mem_warn",
-#                           help = "Memory usage warning threshold in MB. (default=%default).", 
-#                           default = self.getWarningMemoryTreshold())
-#     
-#         memory_options.add_option("-c",
-#                           "--critical",
-#                           dest = "mem_crit",
-#                           help = "Memory usage critical threshold in MB. (default=%default).", 
-#                           default = self.getCriticalMemoryTreshold())
-#         optionParser.add_option_group(memory_options)
         
         if self.__enable_pickle_file_support:
             store_options = OptionGroup(optionParser, "Storage options", "These options are used to change the default storage path for the needed temporary files")
@@ -208,8 +188,8 @@ class ArgusAbstractProbe( object ):
         if self.options.url and (self.options.hostname and self.options.port):
             self.nagios_unknown("Options -u URL and {-H HOSTNAME and -p PORT} are mutually exclusive")
 
-        if not self.options.url and not self.options.hostname and not self.options.url:
-            self.nagios_unknown("Specify either option -u URL or options -H HOSTNAME and -p PORT or read the help (-h)")
+        if not self.options.url and not self.options.hostname:
+            self.nagios_unknown("Specify either option -u URL or option -H HOSTNAME (and -p PORT) or read the help (-h)")
 
         if self.options.port and self.options.hostname:
             optdict = {'hostname': self.options.hostname,
@@ -217,23 +197,10 @@ class ArgusAbstractProbe( object ):
             self.url = Template(self.__url_template).safe_substitute(optdict)
         else:
             self.url = self.options.url
-            
-            
-            
+
+    # set-up the signal-handlers                        
     def sig_handler(signum, frame):
         if signum == signal.SIGALRM:
             nagios_unknown("Received timeout while fetching results.")
         elif signum == signal.SIGTERM:
             nagios_unknown("SIGTERM received.")
-            
-def main():
-    handler = ArgusAbstractProbe()
-    
-    signal.signal(signal.SIGALRM, handler.sig_handler)
-    signal.signal(signal.SIGTERM, handler.sig_handler)
-    
-    handler.readOptions()
-    
-            
-if __name__ == '__main__':
-    main()

@@ -16,16 +16,13 @@
 # limitations under the License.
 #
 # Authors:
-#     Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it
 #     Joel Casutt     - joel.casutt@switch.ch
 #############################################################################
 '''
-Created on 9/dez/2011
+Created on 4/jan/2012
 
-@author: andreaceccanti
 @author: joelcasutt
 '''
-
 import urllib2
 import httplib
 import socket
@@ -37,7 +34,6 @@ class ArgusConnection( urllib2.HTTPSHandler ):
     key = "/etc/grid-security/hostkey.pem"
     cert = "/etc/grid-security/hostcert.pem"
     
-
     def __init__(self, key, cert, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
         urllib2.HTTPSHandler.__init__(self)
         self.file_exists(key)
@@ -56,5 +52,5 @@ class ArgusConnection( urllib2.HTTPSHandler ):
         try:
             open(file)
         except IOError as e:
-           print "Error: %s does not exist or is not readable" % (file)
-           exit(2)
+            print "Error: %s does not exist or is not readable" % (file)
+            exit(2)
