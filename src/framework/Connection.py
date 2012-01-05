@@ -40,12 +40,12 @@ class ArgusConnection( urllib2.HTTPSHandler ):
         self.key = key
         self.file_exists(cert)
         self.cert = cert
-        self.timeout = timeout
+        socket.setglobaltimeout = timeout
  
     def https_open(self, req):
         return self.do_open(self.getConnection, req)
     
-    def getConnection(self, host, timeout):
+    def getConnection(self, host):
         return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
 
     def file_exists(self, file):
