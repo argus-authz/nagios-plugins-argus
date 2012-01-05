@@ -34,7 +34,7 @@ class ArgusConnection( urllib2.HTTPSHandler ):
     key = "/etc/grid-security/hostkey.pem"
     cert = "/etc/grid-security/hostcert.pem"
     
-    def __init__(self, key, cert, timeout=20):
+    def __init__(self, key, cert, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
         urllib2.HTTPSHandler.__init__(self)
         self.file_exists(key)
         self.key = key
@@ -51,6 +51,6 @@ class ArgusConnection( urllib2.HTTPSHandler ):
     def file_exists(self, file):
         try:
             open(file)
-        except IOError, e:
+        except IOError as e:
             print "Error: %s does not exist or is not readable" % (file)
             exit(2)
