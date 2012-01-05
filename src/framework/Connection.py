@@ -51,6 +51,6 @@ class ArgusConnection( urllib2.HTTPSHandler ):
     def file_exists(self, file):
         try:
             open(file)
-        except IOError as e:
+        except IOError, e:
             print "Error: %s does not exist or is not readable" % (file)
             exit(2)
