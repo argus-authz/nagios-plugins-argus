@@ -34,7 +34,7 @@ class ArgusConnection( urllib2.HTTPSHandler ):
     key = "/etc/grid-security/hostkey.pem"
     cert = "/etc/grid-security/hostcert.pem"
     
-    def __init__(self, key, cert, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
+    def __init__(self, key, cert, timeout):
         urllib2.HTTPSHandler.__init__(self)
         self.file_exists(key)
         self.key = key
