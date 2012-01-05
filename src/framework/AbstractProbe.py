@@ -59,7 +59,7 @@ class ArgusAbstractProbe( object ):
     
     # Variables
     __pickle_file = "pickleFile" 
-    __url_template = "https://%(hostname)s:%(port)s"
+    __url_template = "https://%(hostname)s:%(port)s/status"
     usage = "usage %prog [options]"
     optionParser = ""
     options = ""
@@ -101,6 +101,9 @@ class ArgusAbstractProbe( object ):
         
     def getDefaultCaDir( self ):
         return self.DEFAULT_CA_DIR
+    
+    def isHTTPSenabled( self ):
+        return self.__enable_https_client_authentication
 
     # return Values for Nagios
     @staticmethod

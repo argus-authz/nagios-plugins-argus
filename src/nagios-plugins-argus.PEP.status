@@ -23,31 +23,27 @@ Created on 4/jan/2012
 
 @author: joelcasutt
 '''
-from framework.CurrentStatus import ArgusCurrentStatus
+from framework.StatusProbe import ArgusStatusProbe
 import signal
 
 __version__ = "1.0.0"
 
-class PEPCurrentStatus( ArgusCurrentStatus ):
+class PEPStatusProbe( ArgusStatusProbe ):
     
     DEFAULT_PORT = 8154
     CURRENT_SERVICE = 'Argus PEP Server'
 
     def __init__( self, clientAuth ):
-        super(PEPCurrentStatus, self).__init__(clientAuth)
+        super(PEPStatusProbe, self).__init__(clientAuth)
         
     def getDefaultPort( self ):
         return self.DEFAULT_PORT
         
-    def readOptions( self ):
-        super(PEPCurrentStatus, self).readOptions()
-        self.url = self.url + "/status"
-        
     def getStatus( self ):
-        super(PEPCurrentStatus, self).getStatus(self.CURRENT_SERVICE)
+        super(PEPStatusProbe, self).getStatus(self.CURRENT_SERVICE)
         
 def main():
-    handler = PEPCurrentStatus(True)
+    handler = PEPStatusProbe(True)
     
     signal.signal(signal.SIGALRM, handler.sig_handler)
     signal.signal(signal.SIGTERM, handler.sig_handler)

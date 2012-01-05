@@ -23,31 +23,27 @@ Created on 4/jan/2012
 
 @author: joelcasutt
 '''
-from framework.CurrentStatus import ArgusCurrentStatus
+from framework.StatusProbe import ArgusStatusProbe
 import signal
 
 __version__ = "1.0.0"
 
-class PDPCurrentStatus( ArgusCurrentStatus ):
+class PDPStatusProbe( ArgusStatusProbe ):
    
     DEFAULT_PORT = 8152
     CURRENT_SERVICE = 'Argus PDP'
 
     def __init__( self, clientAuth ):
-        super(PDPCurrentStatus, self).__init__(clientAuth)
+        super(PDPStatusProbe, self).__init__(clientAuth)
         
     def getDefaultPort( self ):
         return self.DEFAULT_PORT
         
-    def readOptions( self ):
-        super(PDPCurrentStatus, self).readOptions()
-        self.url = self.url + "/status"
-        
     def getStatus( self ):
-        super(PDPCurrentStatus, self).getStatus(self.CURRENT_SERVICE)
+        super(PDPStatusProbe, self).getStatus(self.CURRENT_SERVICE)
         
 def main():
-    handler = PDPCurrentStatus(False)
+    handler = PDPStatusProbe(False)
     
     signal.signal(signal.SIGALRM, handler.sig_handler)
     signal.signal(signal.SIGTERM, handler.sig_handler)

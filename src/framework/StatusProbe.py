@@ -28,13 +28,13 @@ from AbstractProbe import ArgusAbstractProbe
 
 __version__ = "1.0.0"
 
-class ArgusCurrentStatus( ArgusStatus ):
+class ArgusStatusProbe( ArgusProbe ):
 
     def __init__( self, clientAuth ):
-        super(ArgusCurrentStatus, self).__init__(clientAuth)
+        super(ArgusStatusProbe, self).__init__(clientAuth)
         
     def getStatus( self, CURRENT_SERVICE ):
-        d = ArgusStatus.getStatus( self )
+        d = ArgusProbe.getStatus( self )
         if not d['Service'] == CURRENT_SERVICE:
             ArgusAbstractProbe.nagios_critical("the answering service is not a %s" % CURRENT_SERVICE)
         if d['Status'] == 'OK':

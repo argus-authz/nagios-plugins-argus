@@ -24,7 +24,7 @@ Created on 4/jan/2012
 @author: joelcasutt
 '''
 from AbstractProbe import ArgusAbstractProbe
-from Connection import HTTPSClientAuthenticationHandler
+from HTTPSHandler import HTTPSClientAuthenticationHandler
 from urllib2 import HTTPError, URLError
 import urllib2
 
@@ -33,11 +33,10 @@ __version__ = "1.0.0"
 class ArgusProbe( ArgusAbstractProbe ):
 
     def __init__( self, clientAuth ):
-        super(ArgusStatus, self).__init__(clientAuth)
-        self.__enable_https_client_authentication = clientAuth
+        super(ArgusProbe, self).__init__(clientAuth)
         
     def getStatus( self ):
-        if self.__enable_https_client_authentication:
+        if self.isHTTPSenabled():
             cert_handler = HTTPSClientAuthenticationHandler(key=self.options.key, 
                                                             cert=self.options.cert,
                                                             timeout=self.options.timeout) 
