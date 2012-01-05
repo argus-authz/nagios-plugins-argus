@@ -30,14 +30,21 @@ __version__ = "1.0.0"
 
 class PEPCurrentStatus( ArgusCurrentStatus ):
     
-    DEFAULT_PORT = 8152
+    DEFAULT_PORT = 8154
+    CURRENT_SERVICE = 'Argus PEP Server'
 
     def __init__( self, clientAuth ):
         super(PEPCurrentStatus, self).__init__(clientAuth)
-        self.__enable_https_client_authentication = clientAuth
         
     def getDefaultPort( self ):
         return self.DEFAULT_PORT
+        
+    def readOptions( self ):
+        super(PEPCurrentStatus, self).readOptions()
+        self.url = self.url + "/status"
+        
+    def getStatus( self ):
+        super(PEPCurrentStatus, self).getStatus(self.CURRENT_SERVICE)
         
 def main():
     handler = PEPCurrentStatus(True)

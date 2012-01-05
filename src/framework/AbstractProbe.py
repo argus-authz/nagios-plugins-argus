@@ -24,7 +24,6 @@ Created on 4/jan/2012
 @author: joelcasutt
 '''
 from optparse import OptionParser, OptionGroup
-from string import Template
 from sys import stderr, exit
 import signal
 import inspect
@@ -60,7 +59,7 @@ class ArgusAbstractProbe( object ):
     
     # Variables
     __pickle_file = "pickleFile" 
-    __url_template = "https://${hostname}:${port}/status"
+    __url_template = "https://%(hostname)s:%(port)d"
     usage = "usage %prog [options]"
     optionParser = ""
     options = ""
@@ -192,9 +191,7 @@ class ArgusAbstractProbe( object ):
             self.nagios_unknown("Specify either option -u URL or option -H HOSTNAME (and -p PORT) or read the help (-h)")
 
         if self.options.port and self.options.hostname:
-            optdict = {'hostname': self.options.hostname,
-                       'port': self.options.port}
-            self.url = Template(self.__url_template).safe_substitute(optdict)
+            self.url = self.__url_template % {'hostname': self.options.hostname, 'port': self.options.port}
         else:
             self.url = self.options.url
 

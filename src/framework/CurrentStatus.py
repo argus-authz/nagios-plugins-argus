@@ -32,9 +32,11 @@ class ArgusCurrentStatus( ArgusStatus ):
     def __init__( self, clientAuth ):
         super(ArgusCurrentStatus, self).__init__(clientAuth)
         
-    def getStatus( self ):
+    def getStatus( self, CURRENT_SERVICE ):
         d = ArgusStatus.getStatus( self )
+        if not d['Service'] == CURRENT_SERVICE:
+            super(ArgusCurrentStatus, self).nagios_critical("the answering service is not a %s" % CURRENT_SERVICE)
         if d['Status'] == 'OK':
-            ArgusStatus.nagios_ok(self, "Status Ok")
+            super(ArgusCurrentStatus, self).nagios_ok(d['Service'] + ": " + d['Status'] + " (Started: " + d['ServiceStartupTime'] + ")")
         else:
-            ArgusStatus.nagios_critical(self, "\"Status: OK\" not found.")
+            super(ArgusCurrentStatus, self).nagios_critical("\"Status: OK\" not found.")

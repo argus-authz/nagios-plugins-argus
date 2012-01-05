@@ -30,13 +30,21 @@ __version__ = "1.0.0"
 
 class PAPCurrentStatus( ArgusCurrentStatus ):
    
-    DEFAULT_PORT = 8154
+    DEFAULT_PORT = 8150
+    CURRENT_SERVICE = 'Argus PAP'
 
     def __init__( self, clientAuth ):
         super(PAPCurrentStatus, self).__init__(clientAuth)
         
     def getDefaultPort( self ):
         return self.DEFAULT_PORT
+        
+    def readOptions( self ):
+        super(PAPCurrentStatus, self).readOptions()
+        self.url = self.url + "/pap/status"
+        
+    def getStatus( self ):
+        super(PAPCurrentStatus, self).getStatus(self.CURRENT_SERVICE)
         
 def main():
     handler = PAPCurrentStatus(True)
