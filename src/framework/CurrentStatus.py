@@ -23,7 +23,8 @@ Created on 4/jan/2012
 
 @author: joelcasutt
 '''
-from Status import ArgusStatus
+from Probe import ArgusProbe
+from AbstractProbe import ArgusAbstractProbe
 
 __version__ = "1.0.0"
 
@@ -35,8 +36,8 @@ class ArgusCurrentStatus( ArgusStatus ):
     def getStatus( self, CURRENT_SERVICE ):
         d = ArgusStatus.getStatus( self )
         if not d['Service'] == CURRENT_SERVICE:
-            super(ArgusCurrentStatus, self).nagios_critical("the answering service is not a %s" % CURRENT_SERVICE)
+            ArgusAbstractProbe.nagios_critical("the answering service is not a %s" % CURRENT_SERVICE)
         if d['Status'] == 'OK':
-            super(ArgusCurrentStatus, self).nagios_ok(d['Service'] + ": " + d['Status'] + " (Started: " + d['ServiceStartupTime'] + ")")
+            ArgusAbstractProbe.nagios_ok(d['Service'] + ": " + d['Status'] + " (Started: " + d['ServiceStartupTime'] + ")")
         else:
-            super(ArgusCurrentStatus, self).nagios_critical("\"Status: OK\" not found.")
+            ArgusAbstractProbe.nagios_critical("\"Status: OK\" not found.")

@@ -26,10 +26,11 @@ Created on 4/jan/2012
 import urllib2
 import httplib
 import socket
+from AbstractProbe import ArgusAbstractProbe
 
 __version__ = "1.0.0"
 
-class ArgusConnection( urllib2.HTTPSHandler ):
+class HTTPSClientAuthenticationHandler( urllib2.HTTPSHandler ):
 
     key = "/etc/grid-security/hostkey.pem"
     cert = "/etc/grid-security/hostcert.pem"
@@ -45,11 +46,11 @@ class ArgusConnection( urllib2.HTTPSHandler ):
     def https_open(self, req):
         return self.do_open(self.getConnection, req)
     
-    def getConnection(self, host):
+    def getConnection(self, host, timeout):
         return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
 
     def file_exists(self, file):
         try:
             open(file)
         except IOError, e:
-            raise e
+            ArgusAbstractProbe.nagios_critical(e)

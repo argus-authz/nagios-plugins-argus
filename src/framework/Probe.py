@@ -24,7 +24,7 @@ Created on 4/jan/2012
 @author: joelcasutt
 '''
 from AbstractProbe import ArgusAbstractProbe
-from Connection import ArgusConnection
+from Connection import HTTPSClientAuthenticationHandler
 from urllib2 import HTTPError, URLError
 import urllib2
 
@@ -38,9 +38,9 @@ class ArgusStatus( ArgusAbstractProbe ):
         
     def getStatus( self ):
         if self.__enable_https_client_authentication:
-            cert_handler = ArgusConnection(key=self.options.key, 
-                                           cert=self.options.cert,
-                                           timeout=self.options.timeout) 
+            cert_handler = HTTPSClientAuthenticationHandler(key=self.options.key, 
+                                                            cert=self.options.cert,
+                                                            timeout=self.options.timeout) 
             opener = urllib2.build_opener(cert_handler)
             urllib2.install_opener(opener)
         try:
@@ -48,9 +48,9 @@ class ArgusStatus( ArgusAbstractProbe ):
                 print "Contacting %s..." % self.url
             f = urllib2.urlopen(self.url)
         except HTTPError, e:
-            self.nagios_critical("Error: %s: %s" % (self.url, e))   
+            ArgusAbstractProbe.nagios_critical("Error: %s: %s" % (self.url, e))   
         except URLError, e:
-            self.nagios_critical("Error: %s: %s" % (self.url, e))
+            ArgusAbstractProbe.nagios_critical("Error: %s: %s" % (self.url, e))
         d = dict()
         for line in f:
             (key, value) = line.rsplit('\n')[0].split(": ")

@@ -59,7 +59,7 @@ class ArgusAbstractProbe( object ):
     
     # Variables
     __pickle_file = "pickleFile" 
-    __url_template = "https://%(hostname)s:%(port)d"
+    __url_template = "https://%(hostname)s:%(port)s"
     usage = "usage %prog [options]"
     optionParser = ""
     options = ""
@@ -103,18 +103,22 @@ class ArgusAbstractProbe( object ):
         return self.DEFAULT_CA_DIR
 
     # return Values for Nagios
-    def nagios_exit(self, exit_code, msg):
+    @staticmethod
+    def nagios_exit(exit_code, msg):
         print msg
         exit(exit_code)
+ 
+    @staticmethod
+    def nagios_ok(msg):
+        ArgusAbstractProbe.nagios_exit(ArgusAbstractProbe.OK, msg)
 
-    def nagios_ok(self, msg):
-        self.nagios_exit(self.OK, msg)
+    @staticmethod
+    def nagios_critical(msg):
+        ArgusAbstractProbe.nagios_exit(ArgusAbstractProbe.CRITICAL, msg)
 
-    def nagios_critical(self, msg):
-        self.nagios_exit(self.CRITICAL, msg)
-
-    def nagios_unknown(self, msg):
-        self.nagios_exit(self.UNKNOWN, msg)
+    @staticmethod
+    def nagios_unknown(msg):
+        ArgusAbstractProbe.nagios_exit(ArgusAbstractProbe.UNKNOWN, msg)
         
     # read out the options from the command-line
     def readOptions( self ):
@@ -185,10 +189,10 @@ class ArgusAbstractProbe( object ):
             optionParser.error("Option -H HOSTNAME requires option -p PORT and vice versa. Complete URL can be set using option -u URL")
 
         if self.options.url and (self.options.hostname and self.options.port):
-            self.nagios_unknown("Options -u URL and {-H HOSTNAME and -p PORT} are mutually exclusive")
+            ArgusAbstractProbe.nagios_unknown("Options -u URL and {-H HOSTNAME and -p PORT} are mutually exclusive")
 
         if not self.options.url and not self.options.hostname:
-            self.nagios_unknown("Specify either option -u URL or option -H HOSTNAME (and -p PORT) or read the help (-h)")
+            ArgusAbstractProbe.nagios_unknown("Specify either option -u URL or option -H HOSTNAME (and -p PORT) or read the help (-h)")
 
         if self.options.port and self.options.hostname:
             self.url = self.__url_template % {'hostname': self.options.hostname, 'port': self.options.port}
@@ -198,6 +202,6 @@ class ArgusAbstractProbe( object ):
     # set-up the signal-handlers                        
     def sig_handler(signum, frame):
         if signum == signal.SIGALRM:
-            nagios_unknown("Received timeout while fetching results.")
+            ArgusAbstractProbe.nagios_unknown("Received timeout while fetching results.")
         elif signum == signal.SIGTERM:
-            nagios_unknown("SIGTERM received.")
+            ArgusAbstractProbe.nagios_unknown("SIGTERM received.")
