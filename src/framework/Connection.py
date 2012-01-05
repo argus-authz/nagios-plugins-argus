@@ -52,5 +52,4 @@ class ArgusConnection( urllib2.HTTPSHandler ):
         try:
             open(file)
         except IOError, e:
-            print "Error: %s does not exist or is not readable" % (file)
-            exit(2)
+            raise e
