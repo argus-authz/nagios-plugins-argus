@@ -30,7 +30,7 @@ import urllib2
 
 __version__ = "1.0.0"
 
-class ArgusStatus( ArgusAbstractProbe ):
+class ArgusProbe( ArgusAbstractProbe ):
 
     def __init__( self, clientAuth ):
         super(ArgusStatus, self).__init__(clientAuth)
