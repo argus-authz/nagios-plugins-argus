@@ -26,6 +26,7 @@ Created on 4/jan/2012
 import urllib2
 import httplib
 import socket
+import sys
 from AbstractProbe import ArgusAbstractProbe
 
 __version__ = "1.0.0"
@@ -41,13 +42,18 @@ class HTTPSClientAuthenticationHandler( urllib2.HTTPSHandler ):
         self.key = key
         self.file_exists(cert)
         self.cert = cert
+        self.timeout = timeout
         socket.setglobaltimeout = timeout
  
     def https_open(self, req):
         return self.do_open(self.getConnection, req)
     
-    def getConnection(self, host, timeout):
-        return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
+    if sys.version_info[1] < 5:
+        def getConnection(self, host):
+            return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
+    else:
+        def getConnection(self, host, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
+            return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
 
     def file_exists(self, file):
         try:

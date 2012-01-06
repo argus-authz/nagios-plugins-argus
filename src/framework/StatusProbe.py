@@ -38,6 +38,6 @@ class ArgusStatusProbe( ArgusProbe ):
         if not d['Service'] == CURRENT_SERVICE:
             ArgusAbstractProbe.nagios_critical("the answering service is not a %s" % CURRENT_SERVICE)
         if d['Status'] == 'OK':
-            ArgusAbstractProbe.nagios_ok(d['Service'] + ": " + d['Status'] + " (Started: " + d['ServiceStartupTime'] + ")")
+            ArgusAbstractProbe.nagios_ok(d['Service'] + " " + d['ServiceVersion'] + ": " + d['Status'] + " (Started: " + d['ServiceStartupTime'] + ")")
         else:
             ArgusAbstractProbe.nagios_critical("\"Status: OK\" not found.")
