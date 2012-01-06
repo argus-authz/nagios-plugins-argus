@@ -41,6 +41,9 @@ class ArgusAbstractProbe( object ):
     
     # needs external file switch
     __enable_pickle_file_support = False
+    
+    # memory-options switch
+    __enable_memory_options = False
 
     # Default return values for Nagios
     OK       = 0
@@ -104,16 +107,23 @@ class ArgusAbstractProbe( object ):
     
     def isHTTPSenabled( self ):
         return self.__enable_https_client_authentication
+        
+    def setMemoryOptions( self,memoryOptions ):
+        self.__enable_memory_options = memoryOptions
 
     # return Values for Nagios
     @staticmethod
     def nagios_exit(exit_code, msg):
         print msg
         exit(exit_code)
- 
+        
     @staticmethod
     def nagios_ok(msg):
         ArgusAbstractProbe.nagios_exit(ArgusAbstractProbe.OK, msg)
+
+    @staticmethod
+    def nagios_warning(msg):
+        ArgusAbstractProbe.nagios_exit(ArgusAbstractProbe.WARNING, msg)
 
     @staticmethod
     def nagios_critical(msg):
@@ -154,6 +164,21 @@ class ArgusAbstractProbe( object ):
                       dest="verbose",
                       help="verbose mode [default: %default]",
                       default = self.getDefaultVerbosity())
+                      
+        if self.__enable_memory_options:
+            memory_options = OptionGroup(optionParser, "Memory options", "These options are used to set the nagios-limits for the memory.")
+            memory_options.add_option("-W", 
+                                      "--warning",
+                                      dest = "mem_warn",
+                                      help = "Memory usage warning threshold in MB. (default=%default).", 
+                                      default = self.getWarningMemoryTreshold())
+    
+            memory_options.add_option("-C",
+                                      "--critical",
+                                      dest = "mem_crit",
+                                      help = "Memory usage critical threshold in MB. (default=%default).", 
+                                      default = self.getCriticalMemoryTreshold())
+            optionParser.add_option_group(memory_options)
         
         if self.__enable_pickle_file_support:
             store_options = OptionGroup(optionParser, "Storage options", "These options are used to change the default storage path for the needed temporary files")

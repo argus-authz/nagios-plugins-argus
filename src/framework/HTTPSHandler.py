@@ -48,6 +48,11 @@ class HTTPSClientAuthenticationHandler( urllib2.HTTPSHandler ):
     def https_open(self, req):
         return self.do_open(self.getConnection, req)
     
+    '''
+    There seems to be a change in the API between python 2.4 and more recent versions of python.
+    The getConnection function of the module urllib2 is taking a supplementary argument (timeout)
+    in Versions newer than 2.4.
+    '''
     if sys.version_info[1] < 5:
         def getConnection(self, host):
             return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
