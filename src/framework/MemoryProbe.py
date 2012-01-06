@@ -58,13 +58,14 @@ class ArgusMemoryProbe( ArgusProbe ):
         self.setWarningMemoryTreshold(self.options.mem_warn)
         self.setCriticalMemoryTreshold(self.options.mem_crit)
         __current_used_memory = int(d['UsedMemory'].split()[0]) / 1048576
+        perfdata = " | MemoryUsage=" + str(__current_used_memory) + "MB;" + str(self.getWarningMemoryTreshold()) + ";" + str(self.getCriticalMemoryTreshold())
         if not d['Service'] == CURRENT_SERVICE:
             ArgusAbstractProbe.nagios_critical("the answering service is not a %s" % CURRENT_SERVICE)
         if int(self.getWarningMemoryTreshold())>=int(self.getCriticalMemoryTreshold()):
-            ArgusAbstractProbe.nagios_critical("critical: the threshold for warning (%smb) is equal or higher than the threshold for critical (%smb)" % (self.getWarningMemoryTreshold(), self.getCriticalMemoryTreshold()))
+            ArgusAbstractProbe.nagios_critical("critical: the threshold for warning (%sMB) is equal or higher than the threshold for critical (%sMB)" % (self.getWarningMemoryTreshold(), self.getCriticalMemoryTreshold()))
         if __current_used_memory <= int(self.getWarningMemoryTreshold()):
-            ArgusAbstractProbe.nagios_ok(d['Service'] + " " + d['ServiceVersion'] + " used memory: "  + str(__current_used_memory) + "mb")
+            ArgusAbstractProbe.nagios_ok(d['Service'] + " " + d['ServiceVersion'] + " used memory: "  + str(__current_used_memory) + "MB" + perfdata)
         elif __current_used_memory <= int(self.getCriticalMemoryTreshold()) and __current_used_memory > int(self.getWarningMemoryTreshold()):
-            ArgusAbstractProbe.nagios_warning("warning: used memory (%dmb) higher than warning threshold (%smb)" % (__current_used_memory, self.getWarningMemoryTreshold()))
+            ArgusAbstractProbe.nagios_warning("warning: used memory (%dMB) higher than warning threshold (%sMB)" % (__current_used_memory, self.getWarningMemoryTreshold()))
         else:
-            ArgusAbstractProbe.nagios_critical("critical: used memory (%dmb) higher than critical threshold (%smb)" % (__current_used_memory, self.getCriticalMemoryTreshold()))
+            ArgusAbstractProbe.nagios_critical("critical: used memory (%dMB) higher than critical threshold (%sMB)" % (__current_used_memory, self.getCriticalMemoryTreshold()))

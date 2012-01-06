@@ -167,13 +167,13 @@ class ArgusAbstractProbe( object ):
                       
         if self.__enable_memory_options:
             memory_options = OptionGroup(optionParser, "Memory options", "These options are used to set the nagios-limits for the memory.")
-            memory_options.add_option("-W", 
+            memory_options.add_option("-w", 
                                       "--warning",
                                       dest = "mem_warn",
                                       help = "Memory usage warning threshold in MB. (default=%default).", 
                                       default = self.getWarningMemoryTreshold())
     
-            memory_options.add_option("-C",
+            memory_options.add_option("-c",
                                       "--critical",
                                       dest = "mem_crit",
                                       help = "Memory usage critical threshold in MB. (default=%default).", 
@@ -191,14 +191,12 @@ class ArgusAbstractProbe( object ):
         if self.__enable_https_client_authentication:
             ssl_options = OptionGroup(optionParser,"SSL options", "These options are used to set the SSL certificate to be used to authenticate with the PAP service.")
         
-            ssl_options.add_option("-c",
-                               "--cert",
+            ssl_options.add_option("--cert",
                                dest="cert",
                                help="The SSL client certificate. [default: %default]",
                                default = self.getDefaultCertDir())
         
-            ssl_options.add_option("-k",
-                                "--key",
+            ssl_options.add_option("--key",
                                dest="key",
                                help="The private key (the key must be unencrypted). [default: %default]",
                                default = self.getDefaultKeyDir())
