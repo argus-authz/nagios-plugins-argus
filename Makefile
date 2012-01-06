@@ -24,6 +24,8 @@ NAMESPACE = nagios-plugins-argus
 all: install
 
 install:
-	@echo "Installing in $(INSTALLDIR)/$(NAMESPACE)..."
-	install -d $(DESTDIR)$(INSTALLDIR)/$(NAMESPACE)
-	install -m 0750 src/nagios-plugins-argus.* $(DESTDIR)$(INSTALLDIR)/$(NAMESPACE)
+	@echo "Installing in $(DESTDIR)$(INSTALLDIR)/$(NAMESPACE)..."
+	@install -v -d $(DESTDIR)$(INSTALLDIR)/$(NAMESPACE)
+	@install -v -m 0750 src/nagios-plugins-argus.* $(DESTDIR)$(INSTALLDIR)/$(NAMESPACE)
+	@install -v -d $(DESTDIR)$(INSTALLDIR)/$(NAMESPACE)/framework
+	@install -v -m 0644 src/framework/*.py $(DESTDIR)$(INSTALLDIR)/$(NAMESPACE)/framework
