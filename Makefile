@@ -18,14 +18,16 @@
 #     Joel Casutt     - joel.casutt@switch.ch
 #############################################################################
 
-INSTALLDIR = /usr/libexec/grid-monitoring/probes
-NAMESPACE = nagios-plugins-argus
+PROBES_NAMESPACE = nagios-plugins-argus
+PROBES_LIBEXECDIR = /usr/libexec/grid-monitoring/probes/$(PROBES_NAMESPACE)
+PROBES_VARDIR = /var/lib/grid-monitoring/$(PROBES_NAMESPACE)
 
 all: install
 
 install:
-	@echo "Installing in $(DESTDIR)$(INSTALLDIR)/$(NAMESPACE)..."
-	@install -v -d $(DESTDIR)$(INSTALLDIR)/$(NAMESPACE)
-	@install -v -m 0750 src/nagios-plugins-argus.* $(DESTDIR)$(INSTALLDIR)/$(NAMESPACE)
-	@install -v -d $(DESTDIR)$(INSTALLDIR)/$(NAMESPACE)/framework
-	@install -v -m 0644 src/framework/*.py $(DESTDIR)$(INSTALLDIR)/$(NAMESPACE)/framework
+	@echo "Installing Nagios probes in $(DESTDIR)$(PROBES_LIBEXECDIR)..."
+	@install -v -d $(DESTDIR)$(PROBES_LIBEXECDIR)
+	@install -v -m 0750 src/nagios-plugins-argus.* $(DESTDIR)$(PROBES_LIBEXECDIR)
+	@install -v -d $(DESTDIR)$(PROBES_LIBEXECDIR)/framework
+	@install -v -m 0644 src/framework/*.py $(DESTDIR)$(PROBES_LIBEXECDIR)/framework
+	@install -v -d $(DESTDIR)$(PROBES_VARDIR)
