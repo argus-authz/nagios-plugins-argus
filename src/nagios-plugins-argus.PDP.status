@@ -32,6 +32,7 @@ class PDPStatusProbe( ArgusStatusProbe ):
    
     DEFAULT_PORT = 8152
     CURRENT_SERVICE = 'Argus PDP'
+    CURRENT_PROBE = "nagios-plugins-argus.PDP.status"
 
     def __init__( self, clientAuth ):
         super(PDPStatusProbe, self).__init__(clientAuth)

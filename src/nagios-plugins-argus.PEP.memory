@@ -32,6 +32,7 @@ class PEPMemoryProbe( ArgusMemoryProbe ):
     
     DEFAULT_PORT = 8154
     CURRENT_SERVICE = 'Argus PEP Server'
+    CURRENT_PROBE = "nagios-plugins-argus.PEP.memory"
 
     def __init__( self, clientAuth ):
         super(PEPMemoryProbe, self).__init__(clientAuth)

@@ -32,6 +32,7 @@ class PDPMemoryProbe( ArgusMemoryProbe ):
    
     DEFAULT_PORT = 8152
     CURRENT_SERVICE = 'Argus PDP'
+    CURRENT_PROBE = "nagios-plugins-argus.PDP.memory"
 
     def __init__( self, clientAuth ):
         super(PDPMemoryProbe, self).__init__(clientAuth)

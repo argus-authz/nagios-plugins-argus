@@ -32,6 +32,7 @@ class PAPMemoryProbe( ArgusMemoryProbe ):
    
     DEFAULT_PORT = 8150
     CURRENT_SERVICE = 'Argus PAP'
+    CURRENT_PROBE = "nagios-plugins-argus.PAP.memory"
 
     def __init__( self, clientAuth ):
         super(PAPMemoryProbe, self).__init__(clientAuth)

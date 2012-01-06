@@ -54,14 +54,12 @@ class ArgusAbstractProbe( object ):
     # Default values for the different options and Constants    
     DEFAULT_PORT = "port"
     DEFAULT_TIMEOUT = 20
-    DEFAULT_VERBOSITY = False
-    PICKLE_DIR = "../../../../var/lib/grid-monitoring/" 
+    DEFAULT_VERBOSITY = False 
     DEFAULT_CERT_DIR = "/etc/grid-security/hostcert.pem"
     DEFAULT_KEY_DIR = "/etc/grid-security/hostkey.pem"
     DEFAULT_CA_DIR = "/etc/grid-security/certificates"
     
-    # Variables
-    __pickle_file = "pickleFile" 
+    # Variables 
     __url_template = "https://%(hostname)s:%(port)s/status"
     usage = "usage %prog [options]"
     optionParser = ""
@@ -84,15 +82,6 @@ class ArgusAbstractProbe( object ):
     def getDefaultVerbosity( self ):
         return self.DEFAULT_VERBOSITY
         
-    def getDefaultPickleDir( self ):
-        return self.PICKLE_DIR
-    
-    def getPickleFile( self ):
-        raise NotImplementedError( "Should have overridden the pickle_file" )
-        
-    def setPickleFile( self, pickle_file ):
-        self.__pickle_file = pickle_file
-        
     def getURLTemplate( self ):
         return self.__url_template
         
@@ -110,6 +99,9 @@ class ArgusAbstractProbe( object ):
         
     def setMemoryOptions( self,memoryOptions ):
         self.__enable_memory_options = memoryOptions
+        
+    def setPickleOptions( self,pickleOptions ):
+        self.__enable_pickle_file_support = pickleOptions
 
     # return Values for Nagios
     @staticmethod
@@ -182,10 +174,14 @@ class ArgusAbstractProbe( object ):
         
         if self.__enable_pickle_file_support:
             store_options = OptionGroup(optionParser, "Storage options", "These options are used to change the default storage path for the needed temporary files")
+            store_options.add_option("--tempdir",
+                              dest = "temp_dir",
+                              help = "Storage path for the needed temporary file. [default=%default]",
+                              default = self.getPickleDir())
             store_options.add_option("--tempfile",
-                              dest = "temp_file_path",
-                              help = "Storage path for the needed temporary files. [default=%default]",
-                              default = self.getDefaultPickleDir())
+                              dest = "temp_file",
+                              help = "Name for the needed temporary file. [default=%default]",
+                              default = self.getPickleFile())
             optionParser.add_option_group(store_options)
   
         if self.__enable_https_client_authentication:

@@ -64,7 +64,7 @@ class ArgusMemoryProbe( ArgusProbe ):
         if int(self.getWarningMemoryTreshold())>=int(self.getCriticalMemoryTreshold()):
             ArgusAbstractProbe.nagios_critical("critical: the threshold for warning (%sMB) is equal or higher than the threshold for critical (%sMB)" % (self.getWarningMemoryTreshold(), self.getCriticalMemoryTreshold()))
         if __current_used_memory <= int(self.getWarningMemoryTreshold()):
-            ArgusAbstractProbe.nagios_ok(d['Service'] + " " + d['ServiceVersion'] + " used memory: "  + str(__current_used_memory) + "MB" + perfdata)
+            ArgusAbstractProbe.nagios_ok(d['Service'] + " " + d['ServiceVersion'] + ": Used memory "  + str(__current_used_memory) + "MB" + perfdata)
         elif __current_used_memory <= int(self.getCriticalMemoryTreshold()) and __current_used_memory > int(self.getWarningMemoryTreshold()):
             ArgusAbstractProbe.nagios_warning("warning: used memory (%dMB) higher than warning threshold (%sMB)" % (__current_used_memory, self.getWarningMemoryTreshold()))
         else:

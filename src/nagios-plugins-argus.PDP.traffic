@@ -23,32 +23,28 @@ Created on 4/jan/2012
 
 @author: joelcasutt
 '''
-from framework.StatusProbe import ArgusStatusProbe
+from framework.TrafficProbe import ArgusTrafficProbe
 import signal
 
 __version__ = "1.0.0"
 
-class PAPStatusProbe( ArgusStatusProbe ):
+class PDPTrafficProbe( ArgusTrafficProbe ):
    
-    DEFAULT_PORT = 8150
-    CURRENT_SERVICE = 'Argus PAP'
-    CURRENT_PROBE = "nagios-plugins-argus.PAP.status"
+    DEFAULT_PORT = 8152
+    CURRENT_SERVICE = 'Argus PDP'
+    CURRENT_PROBE = "nagios-plugins-argus.PDP.memory"
 
     def __init__( self, clientAuth ):
-        super(PAPStatusProbe, self).__init__(clientAuth)
+        super(PDPTrafficProbe, self).__init__(clientAuth, CURRENT_PROBE)
         
     def getDefaultPort( self ):
         return self.DEFAULT_PORT
         
-    def readOptions( self ):
-        super(PAPStatusProbe, self).readOptions()
-        self.url = self.url.replace("/status", "/pap/status", 1)
-        
     def getStatus( self ):
-        super(PAPStatusProbe, self).getStatus(self.CURRENT_SERVICE)
+        super(PDPTrafficProbe, self).getStatus(self.CURRENT_SERVICE)
         
 def main():
-    handler = PAPStatusProbe(True)
+    handler = PDPTrafficProbe(False)
     
     signal.signal(signal.SIGALRM, handler.sig_handler)
     signal.signal(signal.SIGTERM, handler.sig_handler)
