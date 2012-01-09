@@ -37,6 +37,8 @@ class PDPMemoryProbe( ArgusMemoryProbe ):
         
 def main():
     probe = PDPMemoryProbe("Argus PDP", False)
+    probe.createParser()
+    probe.readOptions()
     probe.check()
     
 if __name__ == '__main__':

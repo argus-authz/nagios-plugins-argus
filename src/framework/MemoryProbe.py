@@ -37,6 +37,24 @@ class ArgusMemoryProbe( ArgusProbe ):
     def __init__( self, serviceName, clientAuth ):
         super(ArgusMemoryProbe, self).__init__( serviceName, clientAuth )
         
+    def createParser( self ):
+        super(ArgusTrafficProbe, self).createParser()
+        optionParser = self.optionParser
+        memory_options = OptionGroup(optionParser, "Memory options", "These options are used to set the nagios-limits for the memory.")
+        memory_options.add_option("-w", 
+                                  "--warning",
+                                  dest = "mem_warn",
+                                  help = "Memory usage warning threshold in MB. (default=%default).", 
+                                  default = self.getWarningMemoryTreshold())
+
+        memory_options.add_option("-c",
+                                  "--critical",
+                                  dest = "mem_crit",
+                                  help = "Memory usage critical threshold in MB. (default=%default).", 
+                                  default = self.getCriticalMemoryTreshold())
+        optionParser.add_option_group(memory_options)
+        self.optionParser = optionParser
+        
     def getWarningMemoryTreshold( self ):
         return self.__warning_memory_treshold__
         

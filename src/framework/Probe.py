@@ -39,7 +39,7 @@ class ArgusProbe( ArgusAbstractProbe ):
     return the status dictionary
     """
     def getStatus( self ):
-
+        
         if self.isHTTPSClientAuthNenabled():
         
             self.file_exists(self.options.key)

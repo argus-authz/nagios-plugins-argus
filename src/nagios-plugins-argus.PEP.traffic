@@ -37,6 +37,8 @@ class PEPTrafficProbe( ArgusTrafficProbe ):
         
 def main():
     probe = PEPTrafficProbe("Argus PEP Server", True)
+    probe.createParser()
+    probe.readOptions()
     probe.check()
     
 if __name__ == '__main__':

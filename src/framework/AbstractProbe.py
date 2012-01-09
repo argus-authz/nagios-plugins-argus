@@ -39,12 +39,6 @@ class ArgusAbstractProbe( object ):
 
     # SSL-options switch
     __enable_https_client_authentication = False
-    
-    # needs external file switch
-    __enable_pickle_file_support = False
-    
-    # memory-options switch
-    __enable_memory_options = False
 
     # Default return values for Nagios
     OK       = 0
@@ -79,8 +73,6 @@ class ArgusAbstractProbe( object ):
         
         signal.signal(signal.SIGALRM, self.sig_handler)
         signal.signal(signal.SIGTERM, self.sig_handler)
-        
-        self.readOptions()
     
     # getters (and setters) for the default private variables and constants 
     def getProbeName(self):
@@ -140,7 +132,7 @@ class ArgusAbstractProbe( object ):
         self.nagios_exit(self.UNKNOWN, msg)
         
     # read out the options from the command-line
-    def readOptions( self ):
+    def createParser( self ):
         optionParser = self.optionParser
         optionParser.add_option("-H",
                       "--hostname",
@@ -170,33 +162,6 @@ class ArgusAbstractProbe( object ):
                       dest="verbose",
                       help="verbose mode [default: %default]",
                       default = self.getDefaultVerbosity())
-                      
-        if self.__enable_memory_options:
-            memory_options = OptionGroup(optionParser, "Memory options", "These options are used to set the nagios-limits for the memory.")
-            memory_options.add_option("-w", 
-                                      "--warning",
-                                      dest = "mem_warn",
-                                      help = "Memory usage warning threshold in MB. (default=%default).", 
-                                      default = self.getWarningMemoryTreshold())
-    
-            memory_options.add_option("-c",
-                                      "--critical",
-                                      dest = "mem_crit",
-                                      help = "Memory usage critical threshold in MB. (default=%default).", 
-                                      default = self.getCriticalMemoryTreshold())
-            optionParser.add_option_group(memory_options)
-        
-        if self.__enable_pickle_file_support:
-            store_options = OptionGroup(optionParser, "Storage options", "These options are used to change the default storage path for the needed temporary files")
-            store_options.add_option("--tempdir",
-                              dest = "temp_dir",
-                              help = "Storage path for the needed temporary file. [default=%default]",
-                              default = self.getPickleDir())
-            store_options.add_option("--tempfile",
-                              dest = "temp_file",
-                              help = "Name for the needed temporary file. [default=%default]",
-                              default = self.getPickleFile())
-            optionParser.add_option_group(store_options)
   
         if self.__enable_https_client_authentication:
             ssl_options = OptionGroup(optionParser,"SSL options", "These options are used to set the SSL certificate to be used to authenticate with the PAP service.")
@@ -216,7 +181,10 @@ class ArgusAbstractProbe( object ):
                                help="The directory where trust anchors are stored on the system. [default: %default]",
                                default = self.getDefaultCaDir())
             optionParser.add_option_group(ssl_options)
-    
+        
+    def readOptions( self ):
+        optionParser = self.optionParser
+        
         (self.options, self.args) = optionParser.parse_args()
         
         if self.options.hostname and not self.options.port:

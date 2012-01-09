@@ -37,6 +37,8 @@ class PEPStatusProbe( ArgusStatusProbe ):
         
 def main():
     probe = PEPStatusProbe("Argus PEP Server", True)
+    probe.createParser()
+    probe.readOptions()
     probe.check()
     
 if __name__ == '__main__':

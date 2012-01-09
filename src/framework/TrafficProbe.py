@@ -28,22 +28,38 @@ import time
 from os import path, makedirs
 from Probe import ArgusProbe
 from AbstractProbe import ArgusAbstractProbe
+from optparse import OptionParser, OptionGroup
 
 __version__ = "1.0.0"
 
 class ArgusTrafficProbe( ArgusProbe ):
 
-    __pickle_dir = ""
-    __pickle_file = ""
-    __pickle_path = ""
+    __pickle_dir = None
+    __pickle_file = None
+    __pickle_path = None
 
     def __init__( self, serviceName, clientAuth ):
         super(ArgusTrafficProbe, self).__init__(serviceName, clientAuth)
         self.__pickle_dir = "../../../../var/lib/grid-monitoring/%s/" % self.getProbeName()
         self.__pickle_file = "%s_lastState.pickle" % self.getProbeName()
+
         self.__pickle_path = self.getPickleDir() + self.getPickleFile()
-        self.setPickleDir(self.options.temp_dir)
-        self.setPickleFile(self.options.temp_file)
+        
+    def createParser( self ):
+        super(ArgusTrafficProbe, self).createParser()
+        optionParser = self.optionParser
+        store_options = OptionGroup(optionParser, "Storage options", "These options are used to change the default storage path for the needed temporary files")
+        store_options.add_option("--tempdir",
+                          dest = "temp_dir",
+                          help = "Storage path for the needed temporary file. [default=%default]",
+                          default = self.getPickleDir())
+        store_options.add_option("--tempfile",
+                          dest = "temp_file",
+                          help = "Name for the needed temporary file. [default=%default]",
+                          default = self.getPickleFile())
+        optionParser.add_option_group(store_options)
+        
+        self.optionParser = optionParser
         
     def getPicklePath( self ):
         return self.__pickle_path
@@ -62,10 +78,6 @@ class ArgusTrafficProbe( ArgusProbe ):
         if not pickleDir[-1] == '/':
                 self.__pickle_dir = pickleDir + "/"
         self.__pickle_dir = pickleDir
-        
-    def readOptions( self ):
-        self.setPickleOptions(True)
-        super(ArgusTrafficProbe, self).readOptions()
         
     def saveCurrentState( self, state ):
         if not path.exists(self.getPickleDir()):
@@ -100,6 +112,8 @@ class ArgusTrafficProbe( ArgusProbe ):
         
     def check( self ):
         status = ArgusProbe.getStatus( self ) 
+        self.setPickleDir(self.options.temp_dir)
+        self.setPickleFile(self.options.temp_file)
         if not status['Service'] == self.getServiceName():
             self.nagios_critical("the answering service is not a %s" % self.getServiceName())
         diff = self.update(status)

@@ -40,6 +40,8 @@ class PAPTrafficProbe( ArgusTrafficProbe ):
         
 def main():
     probe = PAPTrafficProbe("Argus PAP", True)
+    probe.createParser()
+    probe.readOptions()
     probe.check()
     
 if __name__ == '__main__':

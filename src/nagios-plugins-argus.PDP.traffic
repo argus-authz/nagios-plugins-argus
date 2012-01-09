@@ -37,6 +37,8 @@ class PDPTrafficProbe( ArgusTrafficProbe ):
         
 def main():
     probe = PDPTrafficProbe("Argus PDP", False)
+    probe.createParser()
+    probe.readOptions()
     probe.check()
     
 if __name__ == '__main__':
