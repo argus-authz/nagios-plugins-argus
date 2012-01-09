@@ -80,20 +80,21 @@ class ArgusTrafficProbe( ArgusProbe ):
         try:
             return pickle.load( open( self.getPicklePath(), "rb" ) )
         except Exception, e:
-            self.nagios_warning("could not read last state to temporary file (%s): " + e % self.getPicklePath())
+            self.nagios_warning("could not read last state to temporary file (%s): %s" % self.getPicklePath(), e)
     
     def update( self,status ):
         if path.exists(self.getPicklePath()):
             last_state = self.getLastState()
         else:
-            last_state = {"TotalRequests" : 0, "TotalCompletedRequests" : 0, "Time" : time.time()}
+            last_state = {"TotalRequests" : 0, "TotalCompletedRequests" : 0, "TotalErroneousRequests" : 0, "Time" : time.time()}
             self.saveCurrentState(last_state)
-        current_state = {"TotalRequests" : status['TotalRequests'], "TotalCompletedRequests" : status['TotalCompletedRequests'], "Time" : time.time()} # time is in seconds
+        current_state = {"TotalRequests" : status['TotalRequests'], "TotalCompletedRequests" : status['TotalCompletedRequests'], "TotalErroneousRequests" status['TotalRequestErrors'], "Time" : time.time()} # time is in seconds
         self.saveCurrentState(current_state)
         timeDiff = int(current_state['Time']-last_state['Time'])
         requestsPerSecond = (int(current_state['TotalRequests'])-int(last_state['TotalRequests'])) / timeDiff
-        totalRequestsPerSecond = (int(current_state['TotalCompletedRequests'])-int(last_state['TotalCompletedRequests'])) / timeDiff
-        return {"RequestsPerSecond" : requestsPerSecond, "CompletedRequestsPerSecond" : totalRequestsPerSecond}
+        completedRequestsPerSecond = (int(current_state['TotalCompletedRequests'])-int(last_state['TotalCompletedRequests'])) / timeDiff
+        erroneousRequestsPerSecond = (int(current_state['TotalErroneousRequests'])-int(last_state['TotalErroneousRequests'])) / timeDiff
+        return {"RequestsPerSecond" : requestsPerSecond, "CompletedRequestsPerSecond" : completedRequestsPerSecond, "ErroneousRequestsPerSecond": erroneousRequestsPerSecond}
         
     def check( self ):
         status = ArgusProbe.getStatus( self )
@@ -102,5 +103,5 @@ class ArgusTrafficProbe( ArgusProbe ):
         if not status['Service'] == self.getServiceName():
             self.nagios_critical("the answering service is not a %s" % self.getServiceName())
         diff = self.update(status)
-        perfdata = " | RequestsPerSecond=" + str(diff['RequestsPerSecond']) + " CompletedRequestsPerSecond=" + str(diff['CompletedRequestsPerSecond'])
+        perfdata = " | RequestsPerSecond=" + str(diff['RequestsPerSecond']) + " CompletedRequestsPerSecond=" + str(diff['CompletedRequestsPerSecond'] + " ErroneousRequestsPerSecond=" + str(diff['ErroneousRequestsPerSecond'])
         self.nagios_ok(status['Service'] + " " + status['ServiceVersion'] + ": Requests since last restart " + status['TotalRequests'] + perfdata)
