@@ -53,7 +53,7 @@ class ArgusAbstractProbe( object ):
     UNKNOWN  = 3
     
     # Default values for the different options and Constants    
-    DEFAULT_PORT = "port"
+    DEFAULT_PORT = None
     DEFAULT_TIMEOUT = 20
     DEFAULT_VERBOSITY = False 
     DEFAULT_CERT_DIR = "/etc/grid-security/hostcert.pem"
@@ -62,19 +62,20 @@ class ArgusAbstractProbe( object ):
     
     # Variables 
     usage = "usage %prog [options]"
-    probeName = sys.argv[0].split("/")[-1]
-    serviceName = ""
-    optionParser = ""
-    options = ""
-    args = ""
-    url = ""
+    probeName = None
+    serviceName = None
+    optionParser = None
+    options = None
+    args = None
+    url = None
      
     # constructor
     def __init__( self, serviceName, clientAuth ):
-        self.optionParser = OptionParser(version="%s v.%s" % (inspect.getfile(inspect.currentframe()), __version__))
-        self.__enable_https_client_authentication = clientAuth
-        
+        self.probeName = sys.argv[0].split("/")[-1]
         self.serviceName = serviceName
+
+        self.optionParser = OptionParser(version="%s v.%s" % (self.probeName, __version__))
+        self.__enable_https_client_authentication = clientAuth
         
         signal.signal(signal.SIGALRM, self.sig_handler)
         signal.signal(signal.SIGTERM, self.sig_handler)
@@ -112,7 +113,7 @@ class ArgusAbstractProbe( object ):
     def getDefaultCaDir( self ):
         return self.DEFAULT_CA_DIR
     
-    def isHTTPSenabled( self ):
+    def isHTTPSClientAuthNenabled( self ):
         return self.__enable_https_client_authentication
         
     def setMemoryOptions( self,memoryOptions ):
