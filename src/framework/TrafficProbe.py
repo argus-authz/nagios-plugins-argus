@@ -88,7 +88,6 @@ class ArgusTrafficProbe( ArgusProbe ):
         else:
             last_state = {"TotalRequests" : 0, "TotalCompletedRequests" : 0, "TotalErroneousRequests" : 0, "Time" : time.time()}
             self.saveCurrentState(last_state)
-        print status['TotalRequestErrors']
         current_state = {"TotalRequests" : status['TotalRequests'], "TotalCompletedRequests" : status['TotalCompletedRequests'], "TotalErroneousRequests" : status['TotalRequestErrors'], "Time" : time.time()} # time is in seconds
         self.saveCurrentState(current_state)
         timeDiff = int(current_state['Time']-last_state['Time'])
@@ -98,14 +97,13 @@ class ArgusTrafficProbe( ArgusProbe ):
         return {"RequestsPerSecond" : requestsPerSecond, "CompletedRequestsPerSecond" : completedRequestsPerSecond, "ErroneousRequestsPerSecond": erroneousRequestsPerSecond}
         
     def check( self ):
-        status = ArgusProbe.getStatus( self )
-        if not self.options.temp_dir==None:
+        status = ArgusProbe.getStatus( self ) 
+        if not str(len(self.options.temp_dir) > 0):
             self.setPickleDir(self.options.temp_dir)
-        if not self.options.temp_file==None:
+        if not str(len(self.options.temp_file) > 0):
             self.setPickleFile(self.options.temp_file)
         if not status['Service'] == self.getServiceName():
             self.nagios_critical("the answering service is not a %s" % self.getServiceName())
         diff = self.update(status)
-        #print  + " ErroneousRequestsPerSecond=" + str(diff['ErroneousRequestsPerSecond']
-        perfdata = " | RequestsPerSecond=" + str(diff['RequestsPerSecond']) + " CompletedRequestsPerSecond=" + str(diff['CompletedRequestsPerSecond'])
+        perfdata = " | RequestsPerSecond=" + str(diff['RequestsPerSecond']) + " CompletedRequestsPerSecond=" + str(diff['CompletedRequestsPerSecond']) + " ErroneousRequestsPerSecond=" + str(diff['ErroneousRequestsPerSecond'])
         self.nagios_ok(status['Service'] + " " + status['ServiceVersion'] + ": Requests since last restart " + status['TotalRequests'] + perfdata)
