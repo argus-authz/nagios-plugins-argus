@@ -39,8 +39,8 @@ class ArgusTrafficProbe( ArgusProbe ):
 
     def __init__( self, serviceName, clientAuth ):
         self.__pickle_dir = "../../../../var/lib/grid-monitoring/%s/" % self.getProbeName()
-        self.__pickle_file = "%s_lastState.pickle" % self.getProbeName()
         super(ArgusTrafficProbe, self).__init__(serviceName, clientAuth)
+        self.__pickle_file = "%s_lastState.pickle" % self.getProbeName()
         self.__pickle_path = self.getPickleDir() + self.getPickleFile()
         
     def getPicklePath( self ):
