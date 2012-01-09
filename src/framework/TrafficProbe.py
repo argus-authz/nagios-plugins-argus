@@ -70,7 +70,7 @@ class ArgusTrafficProbe( ArgusProbe ):
             try:
                 makedirs(self.getPickleDir(), 0750)
             except Exception, e:
-                self.nagios_warning("could not create temp-directory (%s): " % self.getPickleDir() + e)
+                self.nagios_warning("could not create temp-directory (%s): %s" % (self.getPickleDir(), e))
         try:
             pickle.dump( state, open( self.getPicklePath(), "wb" ) )
         except Exception, e:
