@@ -31,27 +31,13 @@ __version__ = "1.0.0"
 class PEPMemoryProbe( ArgusMemoryProbe ):
     
     DEFAULT_PORT = 8154
-    CURRENT_SERVICE = 'Argus PEP Server'
-    CURRENT_PROBE = "nagios-plugins-argus.PEP.memory"
 
-    def __init__( self, clientAuth ):
-        super(PEPMemoryProbe, self).__init__(clientAuth)
-        
-    def getDefaultPort( self ):
-        return self.DEFAULT_PORT
-        
-    def getStatus( self ):
-        super(PEPMemoryProbe, self).getStatus(self.CURRENT_SERVICE)
+    def __init__( self, serviceName, clientAuth ):
+        super(PEPMemoryProbe, self).__init__(serviceName, clientAuth)
         
 def main():
-    handler = PEPMemoryProbe(True)
-    
-    signal.signal(signal.SIGALRM, handler.sig_handler)
-    signal.signal(signal.SIGTERM, handler.sig_handler)
-    
-    handler.readOptions()
-    
-    status = handler.getStatus()
+    probe = PEPMemoryProbe("Argus PEP Server", True)
+    probe.check()
     
 if __name__ == '__main__':
     main()

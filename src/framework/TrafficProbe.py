@@ -33,24 +33,32 @@ __version__ = "1.0.0"
 
 class ArgusTrafficProbe( ArgusProbe ):
 
-    __pickle_dir = "../../../../var/lib/grid-monitoring/"
-    __pickle_file = "lastState.p"
+    __pickle_dir = ""
+    __pickle_file = ""
+    __pickle_path = ""
 
-    def __init__( self, clientAuth, CURRENT_PROBE ):
-        self.CURRENT_PROBE = CURRENT_PROBE
-        self.__pickle_dir = "../../../../var/lib/grid-monitoring/%s/" % CURRENT_PROBE
-        super(ArgusTrafficProbe, self).__init__(clientAuth)
+    def __init__( self, serviceName, clientAuth ):
+        self.__pickle_dir = "../../../../var/lib/grid-monitoring/%s/" % self.getProbeName()
+        self.__pickle_file = "%s_lastState.pickle" % self.getProbeName()
+        super(ArgusTrafficProbe, self).__init__(serviceName, clientAuth)
+        self.__pickle_path = self.getPickleDir() + self.getPickleFile()
+        
+    def getPicklePath( self ):
+        return self.__pickle_path
         
     def getPickleFile( self ):
         return self.__pickle_file
         
     def setPickleFile( self,pickleFile ):
         self.__pickle_file = pickleFile
+        self.__pickle_path = self.getPickleDir() + pickleFile
         
     def getPickleDir( self ):
         return self.__pickle_dir
         
     def setPickleDir( self, pickleDir ):
+        if not pickleDir[-1] == '/':
+                self.__pickle_dir = pickleDir + "/"
         self.__pickle_dir = pickleDir
         
     def readOptions( self ):
@@ -58,42 +66,41 @@ class ArgusTrafficProbe( ArgusProbe ):
         super(ArgusTrafficProbe, self).readOptions()
         
     def saveCurrentState( self, state ):
-        if not path.exists(self.__pickle_dir):
+        if not path.exists(self.getPickleDir()):
             try:
-                makedirs(self.__pickle_dir, 0750)
+                makedirs(self.getPickleDir(), 0750)
             except Exception, e:
-                ArgusAbstractProbe.nagios_warning("could not create temp-directory (%s): " % self.__pickle_dir + e)
+                self.nagios_warning("could not create temp-directory (%s): " % self.getPickleDir() + e)
         try:
-            pickle.dump( state, open( self.__pickle_dir + self.__pickle_file, "wb" ) )
+            pickle.dump( state, open( self.getPicklePath(), "wb" ) )
         except Exception, e:
-            tempFile = self.__pickle_dir + self.__pickle_file
-            ArgusAbstractProbe.nagios_warning("could not dump current state to temporary file (%s): " % tempfile + e)
+            self.nagios_warning("could not dump current state to temporary file (%s): %s" % (self.getPicklePath(), e))
         
     def getLastState( self ):
         try:
-            return pickle.load( open( self.__pickle_dir + self.__pickle_file, "rb" ) )
+            return pickle.load( open( self.getPicklePath(), "rb" ) )
         except Exception, e:
-            ArgusAbstractProbe.nagios_warning("could not read last state to temporary file (%s): " + e % self.__pickle_dir + self.__pickle_file)
+            self.nagios_warning("could not read last state to temporary file (%s): " + e % self.getPicklePath())
     
     def update( self,status ):
-        if path.exists(self.__pickle_dir + self.__pickle_file):
+        if path.exists(self.getPicklePath()):
             last_state = self.getLastState()
         else:
             last_state = {"TotalRequests" : 0, "TotalCompletedRequests" : 0, "Time" : time.time()}
             self.saveCurrentState(last_state)
-        current_state = {"TotalRequests" : status['TotalRequests'], "TotalCompletedRequests" : status['TotalCompletedRequests'], "Time" : time.time()}
+        current_state = {"TotalRequests" : status['TotalRequests'], "TotalCompletedRequests" : status['TotalCompletedRequests'], "Time" : time.time()} # time is in seconds
         self.saveCurrentState(current_state)
-        timeDiff = current_state['Time']-last_state['Time']
+        timeDiff = int(current_state['Time']-last_state['Time'])
         requestsPerSecond = (int(current_state['TotalRequests'])-int(last_state['TotalRequests'])) / timeDiff
         totalRequestsPerSecond = (int(current_state['TotalCompletedRequests'])-int(last_state['TotalCompletedRequests'])) / timeDiff
         return {"RequestsPerSecond" : requestsPerSecond, "CompletedRequestsPerSecond" : totalRequestsPerSecond}
         
-    def getStatus( self, CURRENT_SERVICE ):
-        d = ArgusProbe.getStatus( self )
+    def check( self ):
+        status = ArgusProbe.getStatus( self )
         self.setPickleDir(self.options.temp_dir)
         self.setPickleFile(self.options.temp_file)
-        if not d['Service'] == CURRENT_SERVICE:
-            ArgusAbstractProbe.nagios_critical("the answering service is not a %s" % CURRENT_SERVICE)
-        diff = self.update(d)
+        if not status['Service'] == self.getServiceName():
+            self.nagios_critical("the answering service is not a %s" % self.getServiceName())
+        diff = self.update(status)
         perfdata = " | RequestsPerSecond= " + str(diff['RequestsPerSecond']) + "Requests/Sec CompletedRequestsPerSecond=" + str(diff['CompletedRequestsPerSecond']) + "Requests/Sec"
-        ArgusAbstractProbe.nagios_ok(d['Service'] + " " + d['ServiceVersion'] + ": Requests since last restart " + d['TotalRequests'] + perfdata)
+        self.nagios_ok(status['Service'] + " " + status['ServiceVersion'] + ": Requests since last restart " + status['TotalRequests'] + perfdata)

@@ -31,31 +31,16 @@ __version__ = "1.0.0"
 class PAPMemoryProbe( ArgusMemoryProbe ):
    
     DEFAULT_PORT = 8150
-    CURRENT_SERVICE = 'Argus PAP'
-    CURRENT_PROBE = "nagios-plugins-argus.PAP.memory"
 
-    def __init__( self, clientAuth ):
-        super(PAPMemoryProbe, self).__init__(clientAuth)
+    def __init__( self, serviceName, clientAuth ):
+        super(PAPMemoryProbe, self).__init__(serviceName, clientAuth)
         
-    def getDefaultPort( self ):
-        return self.DEFAULT_PORT
-        
-    def readOptions( self ):
-        super(PAPMemoryProbe, self).readOptions()
-        self.url = self.url.replace("/status", "/pap/status", 1)
-        
-    def getStatus( self ):
-        super(PAPMemoryProbe, self).getStatus(self.CURRENT_SERVICE)
+    def getURLTemplate( self ):
+        return "https://%(hostname)s:%(port)s/pap/status"
         
 def main():
-    handler = PAPMemoryProbe(True)
-    
-    signal.signal(signal.SIGALRM, handler.sig_handler)
-    signal.signal(signal.SIGTERM, handler.sig_handler)
-    
-    handler.readOptions()
-    
-    status = handler.getStatus()
+    probe = PAPMemoryProbe("Argus PAP", True)
+    probe.check()
     
 if __name__ == '__main__':
     main()

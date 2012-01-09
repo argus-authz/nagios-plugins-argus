@@ -31,27 +31,13 @@ __version__ = "1.0.0"
 class PEPStatusProbe( ArgusStatusProbe ):
     
     DEFAULT_PORT = 8154
-    CURRENT_SERVICE = 'Argus PEP Server'
-    CURRENT_PROBE = "nagios-plugins-argus.PEP.status"
 
-    def __init__( self, clientAuth ):
-        super(PEPStatusProbe, self).__init__(clientAuth)
-        
-    def getDefaultPort( self ):
-        return self.DEFAULT_PORT
-        
-    def getStatus( self ):
-        super(PEPStatusProbe, self).getStatus(self.CURRENT_SERVICE)
+    def __init__( self, serviceName, clientAuth ):
+        super(PEPStatusProbe, self).__init__(serviceName, clientAuth)
         
 def main():
-    handler = PEPStatusProbe(True)
-    
-    signal.signal(signal.SIGALRM, handler.sig_handler)
-    signal.signal(signal.SIGTERM, handler.sig_handler)
-    
-    handler.readOptions()
-    
-    status = handler.getStatus()
+    probe = PEPStatusProbe("Argus PEP Server", True)
+    probe.check()
     
 if __name__ == '__main__':
     main()

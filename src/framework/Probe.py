@@ -32,11 +32,19 @@ __version__ = "1.0.0"
 
 class ArgusProbe( ArgusAbstractProbe ):
 
-    def __init__( self, clientAuth ):
-        super(ArgusProbe, self).__init__(clientAuth)
-        
+    def __init__( self, serviceName, clientAuth ):
+        super(ArgusProbe, self).__init__(serviceName, clientAuth)
+    
+    """
+    return the status dictionary
+    """
     def getStatus( self ):
+
         if self.isHTTPSenabled():
+        
+            self.file_exists(self.options.key)
+            self.file_exists(self.options.cert)
+                
             cert_handler = HTTPSClientAuthenticationHandler(key=self.options.key, 
                                                             cert=self.options.cert,
                                                             timeout=self.options.timeout) 
@@ -47,14 +55,23 @@ class ArgusProbe( ArgusAbstractProbe ):
                 print "Contacting %s..." % self.url
             f = urllib2.urlopen(self.url)
         except HTTPError, e:
-            ArgusAbstractProbe.nagios_critical("Error: %s: %s" % (self.url, e))   
+            self.nagios_critical("Error: %s: %s" % (self.url, e))   
         except URLError, e:
-            ArgusAbstractProbe.nagios_critical("Error: %s: %s" % (self.url, e))
-        d = dict()
+            self.nagios_critical("Error: %s: %s" % (self.url, e))
+        status = dict()
         for line in f:
             (key, value) = line.rsplit('\n')[0].split(": ")
-            d[key] = value
-        return d
+            status[key] = value
+        return status
         
     def getPickleFile( self ):
         print "no pickle-file needed for this service (Status)"
+    
+    """
+    Exits with NAGIOS_CRITICAL if file doesn't exist or is not readable
+    """
+    def file_exists(self, file):
+        try:
+            open(file, "r")
+        except IOError, e:
+            self.nagios_critical(e)        

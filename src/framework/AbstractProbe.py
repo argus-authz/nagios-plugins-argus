@@ -25,6 +25,7 @@ Created on 4/jan/2012
 '''
 from optparse import OptionParser, OptionGroup
 from sys import stderr, exit
+import sys
 import signal
 import inspect
  
@@ -60,21 +61,38 @@ class ArgusAbstractProbe( object ):
     DEFAULT_CA_DIR = "/etc/grid-security/certificates"
     
     # Variables 
-    __url_template = "https://%(hostname)s:%(port)s/status"
     usage = "usage %prog [options]"
+    probeName = sys.argv[0]
+    serviceName = ""
     optionParser = ""
     options = ""
     args = ""
     url = ""
      
     # constructor
-    def __init__( self, clientAuth ):
+    def __init__( self, serviceName, clientAuth ):
         self.optionParser = OptionParser(version="%s v.%s" % (inspect.getfile(inspect.currentframe()), __version__))
         self.__enable_https_client_authentication = clientAuth
+        
+        self.serviceName = serviceName
+        
+        signal.signal(signal.SIGALRM, self.sig_handler)
+        signal.signal(signal.SIGTERM, self.sig_handler)
+        
+        self.readOptions()
     
-    # getters (and setters) for the default private variables and constants  
+    # getters (and setters) for the default private variables and constants 
+    def getProbeName(self):
+        return self.probeName
+        
+    def getServiceName(self):
+        return self.serviceName
+        
     def getDefaultPort( self ):
-        raise NotImplementedError( "Should have overridden the DEFAULT_PORT" )
+        return self.DEFAULT_PORT
+        
+    def setDefaultPort( self,defaultPort ):
+        self.DEFAULT_PORT = defaultPort
         
     def getDefaultTimeout( self ):
         return self.DEFAULT_TIMEOUT
@@ -83,7 +101,7 @@ class ArgusAbstractProbe( object ):
         return self.DEFAULT_VERBOSITY
         
     def getURLTemplate( self ):
-        return self.__url_template
+        return "https://%(hostname)s:%(port)s/status"
         
     def getDefaultCertDir( self ):
         return self.DEFAULT_CERT_DIR
@@ -104,26 +122,21 @@ class ArgusAbstractProbe( object ):
         self.__enable_pickle_file_support = pickleOptions
 
     # return Values for Nagios
-    @staticmethod
-    def nagios_exit(exit_code, msg):
+    def nagios_exit(self, exit_code, msg):
         print msg
         exit(exit_code)
         
-    @staticmethod
-    def nagios_ok(msg):
-        ArgusAbstractProbe.nagios_exit(ArgusAbstractProbe.OK, msg)
+    def nagios_ok(self,msg):
+        self.nagios_exit(self.OK, msg)
 
-    @staticmethod
-    def nagios_warning(msg):
-        ArgusAbstractProbe.nagios_exit(ArgusAbstractProbe.WARNING, msg)
+    def nagios_warning(self,msg):
+        self.nagios_exit(self.WARNING, msg)
 
-    @staticmethod
-    def nagios_critical(msg):
-        ArgusAbstractProbe.nagios_exit(ArgusAbstractProbe.CRITICAL, msg)
+    def nagios_critical(self,msg):
+        self.nagios_exit(self.CRITICAL, msg)
 
-    @staticmethod
-    def nagios_unknown(msg):
-        ArgusAbstractProbe.nagios_exit(ArgusAbstractProbe.UNKNOWN, msg)
+    def nagios_unknown(self,msg):
+        self.nagios_exit(self.UNKNOWN, msg)
         
     # read out the options from the command-line
     def readOptions( self ):
@@ -201,29 +214,27 @@ class ArgusAbstractProbe( object ):
                                dest="capath", 
                                help="The directory where trust anchors are stored on the system. [default: %default]",
                                default = self.getDefaultCaDir())
-        
             optionParser.add_option_group(ssl_options)
     
         (self.options, self.args) = optionParser.parse_args()
-        
         
         if self.options.hostname and not self.options.port:
             optionParser.error("Option -H HOSTNAME requires option -p PORT and vice versa. Complete URL can be set using option -u URL")
 
         if self.options.url and (self.options.hostname and self.options.port):
-            ArgusAbstractProbe.nagios_unknown("Options -u URL and {-H HOSTNAME and -p PORT} are mutually exclusive")
+            optionParser.error("Options -u URL and {-H HOSTNAME and -p PORT} are mutually exclusive")
 
         if not self.options.url and not self.options.hostname:
-            ArgusAbstractProbe.nagios_unknown("Specify either option -u URL or option -H HOSTNAME (and -p PORT) or read the help (-h)")
+            optionParser.error("Specify either option -u URL or option -H HOSTNAME (and -p PORT) or read the help (-h)")
 
         if self.options.port and self.options.hostname:
-            self.url = self.__url_template % {'hostname': self.options.hostname, 'port': self.options.port}
+            self.url = self.getURLTemplate() % {'hostname': self.options.hostname, 'port': self.options.port}
         else:
             self.url = self.options.url
 
     # set-up the signal-handlers                        
-    def sig_handler(signum, frame):
+    def sig_handler(self,signum, frame):
         if signum == signal.SIGALRM:
-            ArgusAbstractProbe.nagios_unknown("Received timeout while fetching results.")
+            self.nagios_unknown("Received timeout while fetching results.")
         elif signum == signal.SIGTERM:
-            ArgusAbstractProbe.nagios_unknown("SIGTERM received.")
+            self.nagios_unknown("SIGTERM received.")

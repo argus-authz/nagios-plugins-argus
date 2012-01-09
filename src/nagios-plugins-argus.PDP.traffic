@@ -31,27 +31,13 @@ __version__ = "1.0.0"
 class PDPTrafficProbe( ArgusTrafficProbe ):
    
     DEFAULT_PORT = 8152
-    CURRENT_SERVICE = 'Argus PDP'
-    CURRENT_PROBE = "nagios-plugins-argus.PDP.memory"
 
-    def __init__( self, clientAuth ):
-        super(PDPTrafficProbe, self).__init__(clientAuth, CURRENT_PROBE)
-        
-    def getDefaultPort( self ):
-        return self.DEFAULT_PORT
-        
-    def getStatus( self ):
-        super(PDPTrafficProbe, self).getStatus(self.CURRENT_SERVICE)
+    def __init__( self, serviceName, clientAuth ):
+        super(PDPTrafficProbe, self).__init__(serviceName, clientAuth)
         
 def main():
-    handler = PDPTrafficProbe(False)
-    
-    signal.signal(signal.SIGALRM, handler.sig_handler)
-    signal.signal(signal.SIGTERM, handler.sig_handler)
-    
-    handler.readOptions()
-    
-    status = handler.getStatus()
+    probe = PDPTrafficProbe("Argus PDP", False)
+    probe.check()
     
 if __name__ == '__main__':
     main()

@@ -33,14 +33,12 @@ __version__ = "1.0.0"
 
 class HTTPSClientAuthenticationHandler( urllib2.HTTPSHandler ):
 
-    key = "/etc/grid-security/hostkey.pem"
-    cert = "/etc/grid-security/hostcert.pem"
-    
+    """
+    key and cert MUST exists
+    """
     def __init__(self, key, cert, timeout):
         urllib2.HTTPSHandler.__init__(self)
-        self.file_exists(key)
         self.key = key
-        self.file_exists(cert)
         self.cert = cert
         self.timeout = timeout
         socket.setglobaltimeout = timeout
@@ -60,8 +58,3 @@ class HTTPSClientAuthenticationHandler( urllib2.HTTPSHandler ):
         def getConnection(self, host, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
             return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
 
-    def file_exists(self, file):
-        try:
-            open(file)
-        except IOError, e:
-            ArgusAbstractProbe.nagios_critical(e)
