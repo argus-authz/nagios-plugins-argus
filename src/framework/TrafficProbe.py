@@ -42,6 +42,8 @@ class ArgusTrafficProbe( ArgusProbe ):
         self.__pickle_dir = "../../../../var/lib/grid-monitoring/%s/" % self.getProbeName()
         self.__pickle_file = "%s_lastState.pickle" % self.getProbeName()
         self.__pickle_path = self.getPickleDir() + self.getPickleFile()
+        self.setPickleDir(self.options.temp_dir)
+        self.setPickleFile(self.options.temp_file)
         
     def getPicklePath( self ):
         return self.__pickle_path
@@ -98,10 +100,6 @@ class ArgusTrafficProbe( ArgusProbe ):
         
     def check( self ):
         status = ArgusProbe.getStatus( self ) 
-        if not str(len(self.options.temp_dir) > 0):
-            self.setPickleDir(self.options.temp_dir)
-        if not str(len(self.options.temp_file) > 0):
-            self.setPickleFile(self.options.temp_file)
         if not status['Service'] == self.getServiceName():
             self.nagios_critical("the answering service is not a %s" % self.getServiceName())
         diff = self.update(status)
