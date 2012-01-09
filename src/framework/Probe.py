@@ -40,7 +40,7 @@ class ArgusProbe( ArgusAbstractProbe ):
     """
     def getStatus( self ):
 
-        if self.isHTTPSenabled():
+        if self.isHTTPSClientAuthNenabled():
         
             self.file_exists(self.options.key)
             self.file_exists(self.options.cert)
