@@ -88,7 +88,7 @@ class ArgusTrafficProbe( ArgusProbe ):
         else:
             last_state = {"TotalRequests" : 0, "TotalCompletedRequests" : 0, "TotalErroneousRequests" : 0, "Time" : time.time()}
             self.saveCurrentState(last_state)
-        current_state = {"TotalRequests" : status['TotalRequests'], "TotalCompletedRequests" : status['TotalCompletedRequests'], "TotalErroneousRequests" status['TotalRequestErrors'], "Time" : time.time()} # time is in seconds
+        current_state = {"TotalRequests" : status['TotalRequests'], "TotalCompletedRequests" : status['TotalCompletedRequests'], "TotalErroneousRequests" : status['TotalRequestErrors'], "Time" : time.time()} # time is in seconds
         self.saveCurrentState(current_state)
         timeDiff = int(current_state['Time']-last_state['Time'])
         requestsPerSecond = (int(current_state['TotalRequests'])-int(last_state['TotalRequests'])) / timeDiff
