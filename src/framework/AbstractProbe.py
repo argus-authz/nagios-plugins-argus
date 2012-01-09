@@ -62,7 +62,7 @@ class ArgusAbstractProbe( object ):
     
     # Variables 
     usage = "usage %prog [options]"
-    probeName = sys.argv[0]
+    probeName = sys.argv[0].split("/")[-1]
     serviceName = ""
     optionParser = ""
     options = ""
