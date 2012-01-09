@@ -38,8 +38,8 @@ class ArgusTrafficProbe( ArgusProbe ):
     __pickle_path = ""
 
     def __init__( self, serviceName, clientAuth ):
-        self.__pickle_dir = "../../../../var/lib/grid-monitoring/%s/" % self.getProbeName()
         super(ArgusTrafficProbe, self).__init__(serviceName, clientAuth)
+        self.__pickle_dir = "../../../../var/lib/grid-monitoring/%s/" % self.getProbeName()
         self.__pickle_file = "%s_lastState.pickle" % self.getProbeName()
         self.__pickle_path = self.getPickleDir() + self.getPickleFile()
         
@@ -80,7 +80,7 @@ class ArgusTrafficProbe( ArgusProbe ):
         try:
             return pickle.load( open( self.getPicklePath(), "rb" ) )
         except Exception, e:
-            self.nagios_warning("could not read last state to temporary file (%s): %s" % self.getPicklePath(), e)
+            self.nagios_warning("could not read last state to temporary file (%s): %s" % (self.getPicklePath(), e))
     
     def update( self,status ):
         if path.exists(self.getPicklePath()):
@@ -88,6 +88,7 @@ class ArgusTrafficProbe( ArgusProbe ):
         else:
             last_state = {"TotalRequests" : 0, "TotalCompletedRequests" : 0, "TotalErroneousRequests" : 0, "Time" : time.time()}
             self.saveCurrentState(last_state)
+        print status['TotalRequestErrors']
         current_state = {"TotalRequests" : status['TotalRequests'], "TotalCompletedRequests" : status['TotalCompletedRequests'], "TotalErroneousRequests" : status['TotalRequestErrors'], "Time" : time.time()} # time is in seconds
         self.saveCurrentState(current_state)
         timeDiff = int(current_state['Time']-last_state['Time'])
@@ -98,10 +99,13 @@ class ArgusTrafficProbe( ArgusProbe ):
         
     def check( self ):
         status = ArgusProbe.getStatus( self )
-        self.setPickleDir(self.options.temp_dir)
-        self.setPickleFile(self.options.temp_file)
+        if self.options.temp_dir:
+            self.setPickleDir(self.options.temp_dir)
+        if self.options.temp_file:
+            self.setPickleFile(self.options.temp_file)
         if not status['Service'] == self.getServiceName():
             self.nagios_critical("the answering service is not a %s" % self.getServiceName())
         diff = self.update(status)
-        perfdata = " | RequestsPerSecond=" + str(diff['RequestsPerSecond']) + " CompletedRequestsPerSecond=" + str(diff['CompletedRequestsPerSecond'] + " ErroneousRequestsPerSecond=" + str(diff['ErroneousRequestsPerSecond'])
+        #print  + " ErroneousRequestsPerSecond=" + str(diff['ErroneousRequestsPerSecond']
+        perfdata = " | RequestsPerSecond=" + str(diff['RequestsPerSecond']) + " CompletedRequestsPerSecond=" + str(diff['CompletedRequestsPerSecond'])
         self.nagios_ok(status['Service'] + " " + status['ServiceVersion'] + ": Requests since last restart " + status['TotalRequests'] + perfdata)
