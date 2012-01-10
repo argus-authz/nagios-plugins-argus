@@ -38,7 +38,7 @@ class ArgusMemoryProbe( ArgusProbe ):
         super(ArgusMemoryProbe, self).__init__( serviceName, clientAuth )
         
     def createParser( self ):
-        super(ArgusTrafficProbe, self).createParser()
+        super(ArgusMemoryProbe, self).createParser()
         optionParser = self.optionParser
         memory_options = OptionGroup(optionParser, "Memory options", "These options are used to set the nagios-limits for the memory.")
         memory_options.add_option("-w", 
