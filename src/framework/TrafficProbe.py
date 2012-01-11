@@ -121,5 +121,5 @@ class ArgusTrafficProbe( ArgusProbe ):
         if not status['Service'] == self.getServiceName():
             self.nagios_critical("the answering service is not a %s" % self.getServiceName())
         diff = self.update(status)
-        perfdata = " | RequestsPerSecond=" + str(diff['RequestsPerSecond']) + "; RequestsInPeriod" + str(diff['RequestsInPeriod']) + "; CompletedRequestsPerSecond=" + str(diff['CompletedRequestsPerSecond']) + "; CompletedRequestsInPeriod" + str(diff['CompletedRequestsInPeriod']) + "; ErroneousRequestsPerSecond=" + str(diff['ErroneousRequestsPerSecond']) + "; ErroneousRequestsInPeriod" + str(diff['ErroneousRequestsInPeriod']) + ";"
+        perfdata = " | RequestsPerSecond=" + str(diff['RequestsPerSecond']) + "; RequestsInPeriod=" + str(diff['RequestsInPeriod']) + "; CompletedRequestsPerSecond=" + str(diff['CompletedRequestsPerSecond']) + "; CompletedRequestsInPeriod=" + str(diff['CompletedRequestsInPeriod']) + "; ErroneousRequestsPerSecond=" + str(diff['ErroneousRequestsPerSecond']) + "; ErroneousRequestsInPeriod=" + str(diff['ErroneousRequestsInPeriod']) + ";"
         self.nagios_ok(status['Service'] + " " + status['ServiceVersion'] + ": Requests since last restart " + status['TotalRequests'] + perfdata)
