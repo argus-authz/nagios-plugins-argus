@@ -68,13 +68,17 @@ class ArgusAbstractProbe( object ):
         self.probeName = sys.argv[0].split("/")[-1]
         self.serviceName = serviceName
 
-        self.optionParser = OptionParser(version="%s v.%s" % (self.probeName, __version__))
+        self.optionParser = OptionParser(version="%s v.%s" % (self.probeName, self.get__version__()))
         self.__enable_https_client_authentication = clientAuth
         
         signal.signal(signal.SIGALRM, self.sig_handler)
         signal.signal(signal.SIGTERM, self.sig_handler)
     
-    # getters (and setters) for the default private variables and constants 
+    # getters (and setters) for the default private variables and constants
+    def get__version__( self ):
+        print self.__module__.__name__
+        return self.__module__.__version__
+
     def getProbeName(self):
         return self.probeName
         
@@ -107,12 +111,6 @@ class ArgusAbstractProbe( object ):
     
     def isHTTPSClientAuthNenabled( self ):
         return self.__enable_https_client_authentication
-        
-    def setMemoryOptions( self,memoryOptions ):
-        self.__enable_memory_options = memoryOptions
-        
-    def setPickleOptions( self,pickleOptions ):
-        self.__enable_pickle_file_support = pickleOptions
 
     # return Values for Nagios
     def nagios_exit(self, exit_code, msg):

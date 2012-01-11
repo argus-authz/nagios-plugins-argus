@@ -105,11 +105,14 @@ class ArgusTrafficProbe( ArgusProbe ):
             self.saveCurrentState(last_state)
         current_state = {"TotalRequests" : status['TotalRequests'], "TotalCompletedRequests" : status['TotalCompletedRequests'], "TotalErroneousRequests" : status['TotalRequestErrors'], "Time" : time.time()} # time is in seconds
         self.saveCurrentState(current_state)
-        timeDiff = int(current_state['Time']-last_state['Time'])
-        requestsPerSecond = (int(current_state['TotalRequests'])-int(last_state['TotalRequests'])) / timeDiff
-        completedRequestsPerSecond = (int(current_state['TotalCompletedRequests'])-int(last_state['TotalCompletedRequests'])) / timeDiff
-        erroneousRequestsPerSecond = (int(current_state['TotalErroneousRequests'])-int(last_state['TotalErroneousRequests'])) / timeDiff
-        return {"RequestsPerSecond" : requestsPerSecond, "CompletedRequestsPerSecond" : completedRequestsPerSecond, "ErroneousRequestsPerSecond": erroneousRequestsPerSecond}
+        timeDiff = current_state['Time']-last_state['Time']
+        requestsInPeriod = float(int(current_state['TotalRequests'])-int(last_state['TotalRequests']))
+        requestsPerSecond = requestsInPeriod / timeDiff
+        completedRequestsInPeriod = float(int(current_state['TotalCompletedRequests'])-int(last_state['TotalCompletedRequests']))
+        completedRequestsPerSecond = completedRequestsInPeriod / timeDiff
+        erroneousRequestsInPeriod = float(int(current_state['TotalErroneousRequests'])-int(last_state['TotalErroneousRequests']))
+        erroneousRequestsPerSecond = erroneousRequestsInPeriod / timeDiff
+        return {"RequestsInPeriod" : requestsInPeriod, "RequestsPerSecond" : requestsPerSecond, "CompletedRequestsInPeriod" : completedRequestsInPeriod, "CompletedRequestsPerSecond" : completedRequestsPerSecond, "ErroneousRequestsInPeriod" : erroneousRequestsInPeriod, "ErroneousRequestsPerSecond": erroneousRequestsPerSecond}
         
     def check( self ):
         status = ArgusProbe.getStatus( self ) 
@@ -118,5 +121,5 @@ class ArgusTrafficProbe( ArgusProbe ):
         if not status['Service'] == self.getServiceName():
             self.nagios_critical("the answering service is not a %s" % self.getServiceName())
         diff = self.update(status)
-        perfdata = " | RequestsPerSecond=" + str(diff['RequestsPerSecond']) + " CompletedRequestsPerSecond=" + str(diff['CompletedRequestsPerSecond']) + " ErroneousRequestsPerSecond=" + str(diff['ErroneousRequestsPerSecond'])
+        perfdata = " | RequestsPerSecond=" + str(diff['RequestsPerSecond']) + "; RequestsInPeriod" + str(diff['RequestsInPeriod']) + "; CompletedRequestsPerSecond=" + str(diff['CompletedRequestsPerSecond']) + "; CompletedRequestsInPeriod" + str(diff['CompletedRequestsInPeriod']) + "; ErroneousRequestsPerSecond=" + str(diff['ErroneousRequestsPerSecond']) + "; ErroneousRequestsInPeriod" + str(diff['ErroneousRequestsInPeriod']) + ";"
         self.nagios_ok(status['Service'] + " " + status['ServiceVersion'] + ": Requests since last restart " + status['TotalRequests'] + perfdata)
