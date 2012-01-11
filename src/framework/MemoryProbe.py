@@ -67,10 +67,6 @@ class ArgusMemoryProbe( ArgusProbe ):
     def setCriticalMemoryTreshold( self, treshold ):
         self.__critical_memory_treshold__ = treshold
         
-    def readOptions( self ):
-        self.setMemoryOptions(True)
-        super(ArgusMemoryProbe, self).readOptions()
-        
     def check( self ):
         status = self.getStatus()
         self.setWarningMemoryTreshold(self.options.mem_warn)
