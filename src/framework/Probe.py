@@ -39,6 +39,8 @@ class ArgusProbe( ArgusAbstractProbe ):
     return the status dictionary
     """
     def getStatus( self ):
+    
+        VERSION = __version__
         
         if self.isHTTPSClientAuthNenabled():
         

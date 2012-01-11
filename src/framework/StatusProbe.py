@@ -30,6 +30,8 @@ __version__ = "1.0.0"
 
 class ArgusStatusProbe( ArgusProbe ):
 
+    VERSION = __version__
+
     def __init__( self, serviceName, clientAuth ):
         super(ArgusStatusProbe, self).__init__(serviceName, clientAuth)
         
@@ -38,6 +40,7 @@ class ArgusStatusProbe( ArgusProbe ):
         if not status['Service'] == self.getServiceName():
             self.nagios_critical("the answering service is not a %s" % self.getServiceName())
         if status['Status'] == 'OK':
-            self.nagios_ok(status['Service'] + " " + status['ServiceVersion'] + ": " + status['Status'] + " (Started: " + status['ServiceStartupTime'] + ")")
+            self.nagios_ok(status['Service'] + " " + status['ServiceVersion'] + ": " + \
+                           status['Status'] + " (Started: " + status['ServiceStartupTime'] + ")")
         else:
             self.nagios_critical("\"Status: OK\" not found.")

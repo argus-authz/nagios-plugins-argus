@@ -31,6 +31,8 @@ __version__ = "1.0.0"
 
 class ArgusMemoryProbe( ArgusProbe ):
 
+    VERSION = __version__
+
     __warning_memory_treshold__ = 224.0 #MBytes
     __critical_memory_treshold__ = 256.0 #MBytes
 
@@ -40,7 +42,8 @@ class ArgusMemoryProbe( ArgusProbe ):
     def createParser( self ):
         super(ArgusMemoryProbe, self).createParser()
         optionParser = self.optionParser
-        memory_options = OptionGroup(optionParser, "Memory options", "These options are used to set the nagios-limits for the memory.")
+        memory_options = OptionGroup(optionParser, "Memory options", 
+                                    "These options are used to set the nagios-limits for the memory.")
         memory_options.add_option("-w", 
                                   "--warning",
                                   dest = "mem_warn",
@@ -72,14 +75,20 @@ class ArgusMemoryProbe( ArgusProbe ):
         self.setWarningMemoryTreshold(self.options.mem_warn)
         self.setCriticalMemoryTreshold(self.options.mem_crit)
         __current_used_memory = int(status['UsedMemory'].split()[0]) / 1048576
-        perfdata = " | MemoryUsage=" + str(__current_used_memory) + "MB;" + str(self.getWarningMemoryTreshold()) + ";" + str(self.getCriticalMemoryTreshold())
+        perfdata = " | MemoryUsage=" + str(__current_used_memory) + "MB;" + \
+                   str(self.getWarningMemoryTreshold()) + ";" + str(self.getCriticalMemoryTreshold())
         if not status['Service'] == self.getServiceName():
             self.nagios_critical("the answering service is not a %s" % self.getServiceName())
         if int(self.getWarningMemoryTreshold())>=int(self.getCriticalMemoryTreshold()):
-            self.nagios_critical("critical: the threshold for warning (%sMB) is equal or higher than the threshold for critical (%sMB)" % (self.getWarningMemoryTreshold(), self.getCriticalMemoryTreshold()))
+            self.nagios_critical("critical: the threshold for warning (%sMB) is equal or higher than the threshold for critical (%sMB)" 
+                                 % (self.getWarningMemoryTreshold(), self.getCriticalMemoryTreshold()))
         if __current_used_memory <= int(self.getWarningMemoryTreshold()):
-            self.nagios_ok(status['Service'] + " " + status['ServiceVersion'] + ": Used memory "  + str(__current_used_memory) + "MB" + perfdata)
-        elif __current_used_memory <= int(self.getCriticalMemoryTreshold()) and __current_used_memory > int(self.getWarningMemoryTreshold()):
-            self.nagios_warning("warning: used memory (%dMB) higher than warning threshold (%sMB)" % (__current_used_memory, self.getWarningMemoryTreshold()))
+            self.nagios_ok(status['Service'] + " " + status['ServiceVersion'] + ": Used memory "  + \
+                           str(__current_used_memory) + "MB" + perfdata)
+        elif __current_used_memory <= int(self.getCriticalMemoryTreshold()) and \
+             __current_used_memory > int(self.getWarningMemoryTreshold()):
+            self.nagios_warning("warning: used memory (%dMB) higher than warning threshold (%sMB)" \
+                                % (__current_used_memory, self.getWarningMemoryTreshold()))
         else:
-            self.nagios_critical("critical: used memory (%dMB) higher than critical threshold (%sMB)" % (__current_used_memory, self.getCriticalMemoryTreshold()))
+            self.nagios_critical("critical: used memory (%dMB) higher than critical threshold (%sMB)" \
+                                 % (__current_used_memory, self.getCriticalMemoryTreshold()))

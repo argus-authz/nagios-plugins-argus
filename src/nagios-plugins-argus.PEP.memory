@@ -31,6 +31,7 @@ __version__ = "1.0.0"
 class PEPMemoryProbe( ArgusMemoryProbe ):
     
     DEFAULT_PORT = 8154
+    VERSION = __version__
 
     def __init__( self, serviceName, clientAuth ):
         super(PEPMemoryProbe, self).__init__(serviceName, clientAuth)

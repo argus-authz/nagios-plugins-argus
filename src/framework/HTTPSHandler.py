@@ -33,6 +33,8 @@ __version__ = "1.0.0"
 
 class HTTPSClientAuthenticationHandler( urllib2.HTTPSHandler ):
 
+    VERSION = __version__
+
     """
     key and cert MUST exists
     """

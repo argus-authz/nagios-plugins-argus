@@ -31,6 +31,7 @@ __version__ = "1.0.0"
 class PAPMemoryProbe( ArgusMemoryProbe ):
    
     DEFAULT_PORT = 8150
+    VERSION = __version__
 
     def __init__( self, serviceName, clientAuth ):
         super(PAPMemoryProbe, self).__init__(serviceName, clientAuth)

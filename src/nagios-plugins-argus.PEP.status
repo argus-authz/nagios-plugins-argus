@@ -26,11 +26,12 @@ Created on 4/jan/2012
 from framework.StatusProbe import ArgusStatusProbe
 import signal
 
-__version__ = "1.0.1"
+__version__ = "1.0.0"
 
 class PEPStatusProbe( ArgusStatusProbe ):
     
     DEFAULT_PORT = 8154
+    VERSION = __version__
 
     def __init__( self, serviceName, clientAuth ):
         super(PEPStatusProbe, self).__init__(serviceName, clientAuth)
