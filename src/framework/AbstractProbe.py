@@ -28,6 +28,8 @@ from sys import stderr, exit
 import sys
 import signal
 import inspect
+
+import Version
  
 __version__ = "1.0.0"
 
@@ -63,14 +65,12 @@ class ArgusAbstractProbe( object ):
     args = None
     url = None
     
-    VERSION = __version__
-     
     # constructor
     def __init__( self, serviceName, clientAuth ):
         self.probeName = sys.argv[0].split("/")[-1]
         self.serviceName = serviceName
 
-        self.optionParser = OptionParser(version="%s v.%s" % (self.probeName, self.VERSION))
+        self.optionParser = OptionParser(version="%s v.%s" % (self.probeName, Version.getVersion()))
         self.__enable_https_client_authentication = clientAuth
         
         signal.signal(signal.SIGALRM, self.sig_handler)
