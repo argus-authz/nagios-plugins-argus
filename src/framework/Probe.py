@@ -28,8 +28,6 @@ from HTTPSHandler import HTTPSClientAuthenticationHandler
 from urllib2 import HTTPError, URLError
 import urllib2
 
-__version__ = "1.0.0"
-
 class ArgusProbe( ArgusAbstractProbe ):
 
     def __init__( self, serviceName, clientAuth ):
@@ -39,8 +37,6 @@ class ArgusProbe( ArgusAbstractProbe ):
     return the status dictionary
     """
     def getStatus( self ):
-    
-        VERSION = __version__
         
         if self.isHTTPSClientAuthNenabled():
         

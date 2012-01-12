@@ -30,8 +30,6 @@ import signal
 import inspect
 
 import Version
- 
-__version__ = "1.0.0"
 
 class ArgusAbstractProbe( object ):
     """

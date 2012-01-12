@@ -26,12 +26,9 @@ Created on 4/jan/2012
 from framework.TrafficProbe import ArgusTrafficProbe
 import signal
 
-__version__ = "1.0.0"
-
 class PAPTrafficProbe( ArgusTrafficProbe ):
    
     DEFAULT_PORT = 8150
-    VERSION = __version__
 
     def __init__( self, serviceName, clientAuth ):
         super(PAPTrafficProbe, self).__init__(serviceName, clientAuth)

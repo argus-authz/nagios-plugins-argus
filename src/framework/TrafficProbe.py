@@ -30,11 +30,7 @@ from Probe import ArgusProbe
 from AbstractProbe import ArgusAbstractProbe
 from optparse import OptionParser, OptionGroup
 
-__version__ = "1.0.0"
-
 class ArgusTrafficProbe( ArgusProbe ):
-
-    VERSION = __version__
 
     __pickle_dir = None
     __pickle_file = None

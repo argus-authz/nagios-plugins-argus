@@ -27,11 +27,7 @@ from Probe import ArgusProbe
 from AbstractProbe import ArgusAbstractProbe
 from optparse import OptionParser, OptionGroup
 
-__version__ = "1.0.0"
-
 class ArgusMemoryProbe( ArgusProbe ):
-
-    VERSION = __version__
 
     __warning_memory_treshold__ = 224.0 #MBytes
     __critical_memory_treshold__ = 256.0 #MBytes

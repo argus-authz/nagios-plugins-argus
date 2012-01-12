@@ -26,11 +26,7 @@ Created on 4/jan/2012
 from Probe import ArgusProbe
 from AbstractProbe import ArgusAbstractProbe
 
-__version__ = "1.0.0"
-
 class ArgusStatusProbe( ArgusProbe ):
-
-    VERSION = __version__
 
     def __init__( self, serviceName, clientAuth ):
         super(ArgusStatusProbe, self).__init__(serviceName, clientAuth)
