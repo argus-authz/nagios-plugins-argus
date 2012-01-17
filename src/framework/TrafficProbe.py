@@ -25,6 +25,7 @@ Created on 4/jan/2012
 '''
 import pickle
 import time
+import os
 from os import path, makedirs
 from Probe import ArgusProbe
 from AbstractProbe import ArgusAbstractProbe
@@ -34,15 +35,12 @@ class ArgusTrafficProbe( ArgusProbe ):
 
     __pickle_dir = None
     __pickle_file = None
-    __pickle_path = None
 
     def __init__( self, serviceName, clientAuth ):
         super(ArgusTrafficProbe, self).__init__(serviceName, clientAuth)
         namespace = self.getProbeName().split(".")[0]
-        self.__pickle_dir = "../../../../var/lib/grid-monitoring/%s/" % namespace
-        self.__pickle_file = "%s_lastState.pickle" % self.getProbeName()
-
-        self.__pickle_path = self.getPickleDir() + self.getPickleFile()
+        self.__pickle_dir = "../../../../var/lib/grid-monitoring/%s" % namespace
+        self.__pickle_file = "%s.pickle" % self.getProbeName()
         
     def createParser( self ):
         super(ArgusTrafficProbe, self).createParser()
@@ -62,21 +60,19 @@ class ArgusTrafficProbe( ArgusProbe ):
         self.optionParser = optionParser
         
     def getPicklePath( self ):
-        return self.__pickle_path
+        pickle_path = self.getPickleDir() + os.sep + self.getPickleFile()
+        return pickle_path
         
     def getPickleFile( self ):
         return self.__pickle_file
         
     def setPickleFile( self,pickleFile ):
         self.__pickle_file = pickleFile
-        self.__pickle_path = self.getPickleDir() + pickleFile
         
     def getPickleDir( self ):
         return self.__pickle_dir
         
     def setPickleDir( self, pickleDir ):
-        if not pickleDir[-1] == '/':
-                self.__pickle_dir = pickleDir + "/"
         self.__pickle_dir = pickleDir
         
     def saveCurrentState( self, state ):
@@ -137,9 +133,8 @@ class ArgusTrafficProbe( ArgusProbe ):
         if not status['Service'] == self.getServiceName():
             self.nagios_critical("the answering service is not a %s" % self.getServiceName())
         diff = self.update(status)
-        perfdata = " | RequestsPerSecond=" + str(diff['RequestsPerSecond']) + \
-                   "; CompletedRequestsPerSecond=" + str(diff['CompletedRequestsPerSecond']) + \
-                   "; ErroneousRequestsPerSecond=" + str(diff['ErroneousRequestsPerSecond']) + ";"
+        perfdata = " | RequestsPerSecond=%.2f; CompletedRequestsPerSecond=%.2f; ErroneousRequestsPerSecond=%.2f;" %\
+                   (diff['RequestsPerSecond'], diff['CompletedRequestsPerSecond'], diff['ErroneousRequestsPerSecond'])
 # Version with added absolute numbers of request in given time-interval:
 #         perfdata = " | RequestsPerSecond=" + str(diff['RequestsPerSecond']) + \
 #                      "; RequestsInPeriod=" + str(diff['RequestsInPeriod']) + \
