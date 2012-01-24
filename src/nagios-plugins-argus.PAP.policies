@@ -23,21 +23,32 @@ Created on 4/jan/2012
 
 @author: joelcasutt
 '''
-from framework.TrafficProbe import ArgusTrafficProbe
+from framework.Probe import ArgusProbe
 import signal
 
-class PAPTrafficProbe( ArgusTrafficProbe ):
+class PAPPolicyProbe( ArgusProbe ):
    
     DEFAULT_PORT = 8150
 
     def __init__( self, serviceName, clientAuth ):
-        super(PAPTrafficProbe, self).__init__(serviceName, clientAuth)
+        super(PAPPolicyProbe, self).__init__(serviceName, clientAuth)
         
     def getURLTemplate( self ):
         return "https://%(hostname)s:%(port)s/pap/status"
         
+    def check( self ):
+        status = ArgusProbe.getStatus( self )
+        if not status['Service'] == self.getServiceName():
+            self.nagios_critical("the answering service is not a %s" % self.getServiceName())
+        if status['NumberOfPolicies'] != None and status['PolicyLastModificationTime'] != None:
+            self.nagios_ok(status['Service'] + " " + status['ServiceVersion'] + ": Nr. of policies: " + \
+                           status['NumberOfPolicies'] + " (Policies Modified on: " + status['PolicyLastModificationTime'] + ")" + \
+                           " | NumberOfPolicies=%s;" % status['NumberOfPolicies'])
+        else:
+            self.nagios_critical("Could not find data relating to policy-numbers or startup-time.")
+        
 def main():
-    probe = PAPTrafficProbe("Argus PAP", True)
+    probe = PAPPolicyProbe("Argus PAP", True)
     probe.createParser()
     probe.readOptions()
     probe.check()
