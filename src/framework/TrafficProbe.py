@@ -113,7 +113,7 @@ class ArgusTrafficProbe( ArgusProbe ):
                 "ErroneousRequestsPerSecond": 0.00}
         timeDiff = current_state['Time']-last_state['Time']
         
-        if int(current_state['TotalRequests'] == int(last_state['TotalRequests']):
+        if int(current_state['TotalRequests']) == int(last_state['TotalRequests']):
             requestsInPeriod = 0.00
             requestsPerSecond = 0.00
         else:
