@@ -99,7 +99,7 @@ class ArgusTrafficProbe( ArgusProbe ):
         current_state = {"TotalRequests" : status['TotalRequests'], 
                          "TotalCompletedRequests" : status['TotalCompletedRequests'], 
                          "TotalErroneousRequests" : status['TotalRequestErrors'], 
-                         "Time" : time.time()} # time is in seconds
+                         "Time" : str(time.time())} # time is in seconds
         if path.exists(self.getPicklePath()):
             last_state = self.getLastState()
             self.saveCurrentState(current_state)
