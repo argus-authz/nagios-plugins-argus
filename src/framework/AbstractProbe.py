@@ -151,7 +151,7 @@ class ArgusAbstractProbe( object ):
         optionParser.add_option("-u",
                       "--url",
                       dest="url",
-                      help="The status endpoint URL of the service. Example: https://hostname:8150/status")
+                      help="The status endpoint URL of the service. Example: https://hostname:port/status")
     
         optionParser.add_option("-t",
                       "--timeout",

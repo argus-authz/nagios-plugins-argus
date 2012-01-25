@@ -112,30 +112,15 @@ class ArgusTrafficProbe( ArgusProbe ):
                 "ErroneousRequestsInPeriod" : 0, 
                 "ErroneousRequestsPerSecond": 0.00}
         timeDiff = float(current_state['Time'])-float(last_state['Time'])
-        
-        if int(current_state['TotalRequests']) == int(last_state['TotalRequests']):
-            requestsInPeriod = 0.00
-            requestsPerSecond = 0.00
-        else:
-            requestsInPeriod = float(int(current_state['TotalRequests'])
-                                    -int(last_state['TotalRequests']))
-            requestsPerSecond = requestsInPeriod / timeDiff
-        
-        if int(current_state['TotalCompletedRequests']) == int(last_state['TotalCompletedRequests']):
-            completedRequestsInPeriod = 0.00
-            completedRequestsPerSecond = 0.00
-        else:
-            completedRequestsInPeriod = float(int(current_state['TotalCompletedRequests'])
-                                            -int(last_state['TotalCompletedRequests']))
-            completedRequestsPerSecond = completedRequestsInPeriod / timeDiff
-        
-        if int(current_state['TotalErroneousRequests']) == int(last_state['TotalErroneousRequests']):
-            erroneousRequestsInPeriod = 0.00
-            erroneousRequestsPerSecond = 0.00
-        else:
-            erroneousRequestsInPeriod = float(int(current_state['TotalErroneousRequests'])
-                                            -int(last_state['TotalErroneousRequests']))
-            erroneousRequestsPerSecond = erroneousRequestsInPeriod / timeDiff
+        requestsInPeriod = float(int(current_state['TotalRequests'])
+                                -int(last_state['TotalRequests']))
+        requestsPerSecond = requestsInPeriod / timeDiff
+        completedRequestsInPeriod = float(int(current_state['TotalCompletedRequests'])
+                                        -int(last_state['TotalCompletedRequests']))
+        completedRequestsPerSecond = completedRequestsInPeriod / timeDiff
+        erroneousRequestsInPeriod = float(int(current_state['TotalErroneousRequests'])
+                                        -int(last_state['TotalErroneousRequests']))
+        erroneousRequestsPerSecond = erroneousRequestsInPeriod / timeDiff
             
         return {"RequestsInPeriod" : round(requestsInPeriod), 
                 "RequestsPerSecond" : round(requestsPerSecond,2), 
