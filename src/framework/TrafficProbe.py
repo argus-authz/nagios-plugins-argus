@@ -146,9 +146,11 @@ class ArgusTrafficProbe( ArgusProbe ):
         
     def check( self ):
         status = ArgusProbe.getStatus( self ) 
-        self.setPickleFile(self.getHostname() + "-" + self.getPickleFile())
         self.setPickleDir(self.options.temp_dir)
-        self.setPickleFile(self.options.temp_file)
+        if not self.options.temp_file == self.getPickleFile():
+            self.setPickleFile(self.options.temp_file)
+        else:
+            self.setPickleFile("%s.%s.pickle" % (self.getHostname(), self.getProbeName()))
         if not status['Service'] == self.getServiceName():
             self.nagios_critical("the answering service is not a %s" % self.getServiceName())
         diff = self.update(status)
