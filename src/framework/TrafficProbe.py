@@ -146,7 +146,7 @@ class ArgusTrafficProbe( ArgusProbe ):
         
     def check( self ):
         status = ArgusProbe.getStatus( self ) 
-        self.setPickleFile(self.getHostname() + "-" + self.getPickleFile)
+        self.setPickleFile(self.getHostname() + "-" + self.getPickleFile())
         self.setPickleDir(self.options.temp_dir)
         self.setPickleFile(self.options.temp_file)
         if not status['Service'] == self.getServiceName():
