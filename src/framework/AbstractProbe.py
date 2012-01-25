@@ -25,6 +25,7 @@ Created on 4/jan/2012
 '''
 from optparse import OptionParser, OptionGroup
 from sys import stderr, exit
+from urlparse import urlparse
 import sys
 import signal
 import inspect
@@ -95,6 +96,14 @@ class ArgusAbstractProbe( object ):
         
     def getURLTemplate( self ):
         return "https://%(hostname)s:%(port)s/status"
+        
+    def getHostname ( self ):
+        if self.options.hostname:
+            return self.options.hostname
+        elif self.options.url:
+            return urlparse(self.options.url)[1].split(':')[0]
+        else:
+            nagios_warning("could not determine hostname out of the given")
         
     def getDefaultCertDir( self ):
         return self.DEFAULT_CERT_DIR

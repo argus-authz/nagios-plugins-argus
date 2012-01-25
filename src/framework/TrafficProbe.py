@@ -40,7 +40,7 @@ class ArgusTrafficProbe( ArgusProbe ):
         super(ArgusTrafficProbe, self).__init__(serviceName, clientAuth)
         namespace = self.getProbeName().split(".")[0]
         self.__pickle_dir = "../../../../var/lib/grid-monitoring/%s" % namespace
-        self.__pickle_file = "%s.pickle" % self.getProbeName()
+        self.__pickle_file = "hostname.%s.pickle" % self.getProbeName()
         
     def createParser( self ):
         super(ArgusTrafficProbe, self).createParser()
@@ -146,6 +146,7 @@ class ArgusTrafficProbe( ArgusProbe ):
         
     def check( self ):
         status = ArgusProbe.getStatus( self ) 
+        self.setPickleFile(self.getHostname() + "-" + self.getPickleFile)
         self.setPickleDir(self.options.temp_dir)
         self.setPickleFile(self.options.temp_file)
         if not status['Service'] == self.getServiceName():
