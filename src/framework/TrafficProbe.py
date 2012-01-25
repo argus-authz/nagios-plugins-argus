@@ -96,23 +96,25 @@ class ArgusTrafficProbe( ArgusProbe ):
                                 % (self.getPicklePath(), e))
     
     def update( self,status ):
-        if path.exists(self.getPicklePath()):
-            last_state = self.getLastState()
-        else:
-            last_state = {"TotalRequests" : 0, 
-                          "TotalCompletedRequests" : 0, 
-                          "TotalErroneousRequests" : 0, 
-                          "Time" : time.time()}
-            self.saveCurrentState(last_state)
         current_state = {"TotalRequests" : status['TotalRequests'], 
                          "TotalCompletedRequests" : status['TotalCompletedRequests'], 
                          "TotalErroneousRequests" : status['TotalRequestErrors'], 
                          "Time" : time.time()} # time is in seconds
-        self.saveCurrentState(current_state)
+        if path.exists(self.getPicklePath()):
+            last_state = self.getLastState()
+            self.saveCurrentState(current_state)
+        else:
+            self.saveCurrentState(current_state)
+            return {"RequestsInPeriod" : 0, 
+                "RequestsPerSecond" : 0.00, 
+                "CompletedRequestsInPeriod" : 0, 
+                "CompletedRequestsPerSecond" : 0.00, 
+                "ErroneousRequestsInPeriod" : 0, 
+                "ErroneousRequestsPerSecond": 0.00}
         timeDiff = current_state['Time']-last_state['Time']
-        
         requestsInPeriod = float(int(current_state['TotalRequests'])
                                 -int(last_state['TotalRequests']))
+      
         if requestsInPeriod > 0.9:
             requestsPerSecond = requestsInPeriod / timeDiff
         else:
