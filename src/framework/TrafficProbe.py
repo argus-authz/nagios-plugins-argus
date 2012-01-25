@@ -110,15 +110,28 @@ class ArgusTrafficProbe( ArgusProbe ):
                          "Time" : time.time()} # time is in seconds
         self.saveCurrentState(current_state)
         timeDiff = current_state['Time']-last_state['Time']
+        
         requestsInPeriod = float(int(current_state['TotalRequests'])
                                 -int(last_state['TotalRequests']))
-        requestsPerSecond = requestsInPeriod / timeDiff
+        if requestsInPeriod > 0.9:
+            requestsPerSecond = requestsInPeriod / timeDiff
+        else:
+            requestsPerSecond = 0
+        
         completedRequestsInPeriod = float(int(current_state['TotalCompletedRequests'])
                                          -int(last_state['TotalCompletedRequests']))
-        completedRequestsPerSecond = completedRequestsInPeriod / timeDiff
+        if completedRequestsInPeriod > 0.9:
+            completedRequestsPerSecond = completedRequestsInPeriod / timeDiff
+        else:
+            completedRequestsPerSecond = 0
+        
         erroneousRequestsInPeriod = float(int(current_state['TotalErroneousRequests'])
                                          -int(last_state['TotalErroneousRequests']))
-        erroneousRequestsPerSecond = erroneousRequestsInPeriod / timeDiff
+        if erroneousRequestsInPeriod > 0.9:
+            erroneousRequestsPerSecond = erroneousRequestsInPeriod / timeDiff
+        else:
+            erroneousRequestsPerSecond = 0
+            
         return {"RequestsInPeriod" : round(requestsInPeriod), 
                 "RequestsPerSecond" : round(requestsPerSecond,2), 
                 "CompletedRequestsInPeriod" : round(completedRequestsInPeriod), 
