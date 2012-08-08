@@ -15,14 +15,39 @@
 # limitations under the License.
 #
 # Authors:
-#     Joel Casutt     - joel.casutt@switch.ch
+#     Joel Casutt     <joel.casutt@switch.ch>
+#     Valery Tschopp  <valery.tschopp@switch.ch>
 #############################################################################
 
 PROBES_NAMESPACE = nagios-plugins-argus
 PROBES_LIBEXECDIR = /usr/libexec/grid-monitoring/probes/$(PROBES_NAMESPACE)
 PROBES_VARDIR = /var/lib/grid-monitoring/$(PROBES_NAMESPACE)
 
+name=nagios-plugins-argus
+spec=fedora/$(name).spec
+version=$(shell grep "Version:" $(spec) | sed -e "s/Version://g" -e "s/[ \t]*//g")
+release=1
+rpmbuild_dir=$(shell pwd)/rpmbuild
+stage_dir=$(shell pwd)/stage
+
+
 all: install
+
+dist:
+	@echo "Packaging sources"
+	@rm -fr $(name)-$(version)
+	@mkdir $(name)-$(version)
+	@cp -rv src $(name)-$(version)
+	@cp -v Makefile $(name)-$(version)
+	@cp -v LICENSE README AUTHORS CHANGELOG $(name)-$(version)
+	@rm $(name)-$(version).tar.gz
+	@tar -cvzf $(name)-$(version).tar.gz $(name)-$(version)
+	@rm -fr $(name)-$(version)
+
+clean:
+	@echo "Cleaning..."
+	rm -fr $(name)-$(version) *.tar.gz
+
 
 install:
 	@echo "Installing Nagios probes in $(DESTDIR)$(PROBES_LIBEXECDIR)..."

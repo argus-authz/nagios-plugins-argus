@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #############################################################################
 # Copyright (c) Members of the EGEE Collaboration. 2006-2010.
 # See http://www.eu-egee.org/partners/ for details on the copyright holders.
@@ -19,7 +18,7 @@
 #     Joel Casutt     - joel.casutt@switch.ch
 #############################################################################
 
-__VERSION__ = "1.0.0"
+__VERSION__ = "1.0.1"
 
 def getVersion():
    return __VERSION__
