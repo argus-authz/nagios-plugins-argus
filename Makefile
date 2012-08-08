@@ -46,7 +46,7 @@ dist:
 
 clean:
 	@echo "Cleaning..."
-	rm -fr $(name)-$(version) *.tar.gz RPMS tgz
+	rm -fr $(name)-$(version) *.tar.gz rpmbuild RPMS tgz
 
 
 install:
