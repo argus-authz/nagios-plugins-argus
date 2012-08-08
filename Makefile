@@ -71,5 +71,5 @@ etics: rpm
 	@echo "Publishing RPMs and tarballs"
 	@mkdir -p tgz RPMS
 	@cp -v $(name)-$(version).src.tar.gz tgz
-	@test -f $(name)-$(version).bin.tar.gz && cp -v $(name)-$(version).bin.tar.gz tgz/$(name)-$(version).tar.gz
+	@test ! -f $(name)-$(version).bin.tar.gz || cp -v $(name)-$(version).bin.tar.gz tgz/$(name)-$(version).tar.gz
 	@cp -rv $(rpmbuild_dir)/RPMS/* $(rpmbuild_dir)/SRPMS/* RPMS
