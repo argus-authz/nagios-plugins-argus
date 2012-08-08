@@ -19,7 +19,7 @@ Requires: python
 Nagios plugins for the Argus Authorization Service (EMI)
 
 %prep
-%setup
+%setup -q
 
 %build
 
