@@ -40,13 +40,13 @@ dist:
 	@cp -rv src $(name)-$(version)
 	@cp -v Makefile $(name)-$(version)
 	@cp -v LICENSE README AUTHORS CHANGELOG $(name)-$(version)
-	@rm $(name)-$(version).tar.gz
+	@rm -f $(name)-$(version).tar.gz
 	@tar -cvzf $(name)-$(version).tar.gz $(name)-$(version)
 	@rm -fr $(name)-$(version)
 
 clean:
 	@echo "Cleaning..."
-	rm -fr $(name)-$(version) *.tar.gz
+	rm -fr $(name)-$(version) *.tar.gz RPMS tgz
 
 
 install:
@@ -56,3 +56,20 @@ install:
 	@install -v -d $(DESTDIR)$(PROBES_LIBEXECDIR)/framework
 	@install -v -m 0644 src/framework/*.py $(DESTDIR)$(PROBES_LIBEXECDIR)/framework
 	@install -v -d $(DESTDIR)$(PROBES_VARDIR)
+
+rpm: dist
+	@mv -v $(name)-$(version).tar.gz $(name)-$(version).src.tar.gz
+	@echo "Building RPM in $(rpmbuild_dir)"
+	@mkdir -p $(rpmbuild_dir)/BUILD $(rpmbuild_dir)/RPMS \
+		$(rpmbuild_dir)/SOURCES $(rpmbuild_dir)/SPECS \
+		$(rpmbuild_dir)/SRPMS
+	@cp -v $(name)-$(version).src.tar.gz $(rpmbuild_dir)/SOURCES/$(name)-$(version).tar.gz
+	@rpmbuild -v -ba $(spec_file) --define "_topdir $(rpmbuild_dir)"
+
+
+etics: rpm
+	@echo "Publishing RPMs and tarballs"
+	@mkdir -p tgz RPMS
+	@cp -v $(name)-$(version).src.tar.gz tgz
+	@test -f $(name)-$(version).bin.tar.gz && cp -v $(name)-$(version).bin.tar.gz tgz/$(name)-$(version).tar.gz
+	@cp -rv $(rpmbuild_dir)/RPMS/* $(rpmbuild_dir)/SRPMS/* RPMS
