@@ -13,6 +13,8 @@ Source: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
 
+Requires: python
+
 %description
 Nagios plugins for the Argus Authorization Service (EMI)
 
