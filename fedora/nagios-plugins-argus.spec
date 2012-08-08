@@ -55,7 +55,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir /var/lib/grid-monitoring/%{name}
 
-%doc README CHANGELOG
+%doc LICENSE COPYRIGHT README CHANGELOG
 
 %changelog
 * Fri Aug 3 2012 Valery Tschopp <valery.tschopp@switch.ch> 1.0.1-1
