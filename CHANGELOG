@@ -1,5 +1,8 @@
-Argus Authorization Service - Nagios Probes
--------------------------------------------
+Nagio probes for the Argus Authorization Service
+------------------------------------------------
+Version 1.0.1:
+* Minor changes.
+* Self managed packaging (RPM) with a spec file.
 
 Version 1.0.0:
 * nagios probes for Argus 1.5 (EMI-2) release
