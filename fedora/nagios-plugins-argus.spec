@@ -2,7 +2,7 @@ Name: nagios-plugins-argus
 
 Version: 1.0.1
 Release: 1%{?dist}
-Summary: Nagios pluging for Argus
+Summary: Nagios plugins for Argus
 
 
 License: ASL 2.0
