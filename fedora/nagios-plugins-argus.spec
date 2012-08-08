@@ -33,15 +33,15 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %dir %{_libexecdir}/grid-monitoring/probes/%{name}
-%{_libexecdir}/grid-monitoring/probes/nagios-plugins-argus/nagios-plugins-argus.PDP.traffic
-%{_libexecdir}/grid-monitoring/probes/nagios-plugins-argus/nagios-plugins-argus.PEP.memory
-%{_libexecdir}/grid-monitoring/probes/nagios-plugins-argus/nagios-plugins-argus.PAP.policies
-%{_libexecdir}/grid-monitoring/probes/nagios-plugins-argus/nagios-plugins-argus.PDP.status
-%{_libexecdir}/grid-monitoring/probes/nagios-plugins-argus/nagios-plugins-argus.PEP.traffic
-%{_libexecdir}/grid-monitoring/probes/nagios-plugins-argus/nagios-plugins-argus.PEP.status
-%{_libexecdir}/grid-monitoring/probes/nagios-plugins-argus/nagios-plugins-argus.PAP.memory
-%{_libexecdir}/grid-monitoring/probes/nagios-plugins-argus/nagios-plugins-argus.PDP.memory
-%{_libexecdir}/grid-monitoring/probes/nagios-plugins-argus/nagios-plugins-argus.PAP.status
+%{_libexecdir}/grid-monitoring/probes/%{name}/nagios-plugins-argus.PDP.traffic
+%{_libexecdir}/grid-monitoring/probes/%{name}/nagios-plugins-argus.PEP.memory
+%{_libexecdir}/grid-monitoring/probes/%{name}/nagios-plugins-argus.PAP.policies
+%{_libexecdir}/grid-monitoring/probes/%{name}/nagios-plugins-argus.PDP.status
+%{_libexecdir}/grid-monitoring/probes/%{name}/nagios-plugins-argus.PEP.traffic
+%{_libexecdir}/grid-monitoring/probes/%{name}/nagios-plugins-argus.PEP.status
+%{_libexecdir}/grid-monitoring/probes/%{name}/nagios-plugins-argus.PAP.memory
+%{_libexecdir}/grid-monitoring/probes/%{name}/nagios-plugins-argus.PDP.memory
+%{_libexecdir}/grid-monitoring/probes/%{name}/nagios-plugins-argus.PAP.status
 
 %dir %{_libexecdir}/grid-monitoring/probes/%{name}/framework
 %{_libexecdir}/grid-monitoring/probes/%{name}/framework/__init__.py
