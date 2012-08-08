@@ -24,8 +24,8 @@ PROBES_LIBEXECDIR = /usr/libexec/grid-monitoring/probes/$(PROBES_NAMESPACE)
 PROBES_VARDIR = /var/lib/grid-monitoring/$(PROBES_NAMESPACE)
 
 name=nagios-plugins-argus
-spec=fedora/$(name).spec
-version=$(shell grep "Version:" $(spec) | sed -e "s/Version://g" -e "s/[ \t]*//g")
+spec_file=fedora/$(name).spec
+version=$(shell grep "Version:" $(spec_file) | sed -e "s/Version://g" -e "s/[ \t]*//g")
 release=1
 rpmbuild_dir=$(shell pwd)/rpmbuild
 stage_dir=$(shell pwd)/stage
