@@ -27,6 +27,7 @@ name=nagios-plugins-argus
 spec_file=fedora/$(name).spec
 version=$(shell grep "Version:" $(spec_file) | sed -e "s/Version://g" -e "s/[ \t]*//g")
 release=1
+arch=noarch
 rpmbuild_dir=$(shell pwd)/rpmbuild
 stage_dir=$(shell pwd)/stage
 
@@ -35,14 +36,14 @@ all: install
 
 dist:
 	@echo "Packaging sources"
-	@rm -fr $(name)-$(version)
-	@mkdir $(name)-$(version)
-	@cp -rv src $(name)-$(version)
-	@cp -v Makefile $(name)-$(version)
-	@cp -v COPYRIGHT LICENSE README AUTHORS CHANGELOG $(name)-$(version)
-	@rm -f $(name)-$(version).tar.gz
-	@tar -cvzf $(name)-$(version).tar.gz $(name)-$(version)
-	@rm -fr $(name)-$(version)
+	rm -fr $(name)-$(version)
+	mkdir $(name)-$(version)
+	cp -r src $(name)-$(version)
+	cp Makefile $(name)-$(version)
+	cp COPYRIGHT LICENSE README AUTHORS CHANGELOG $(name)-$(version)
+	rm -f $(name)-$(version).tar.gz
+	tar -czf $(name)-$(version).tar.gz $(name)-$(version)
+	rm -fr $(name)-$(version)
 
 clean:
 	@echo "Cleaning..."
@@ -51,25 +52,27 @@ clean:
 
 install:
 	@echo "Installing Nagios probes in $(DESTDIR)$(PROBES_LIBEXECDIR)..."
-	@install -v -d $(DESTDIR)$(PROBES_LIBEXECDIR)
-	@install -v -m 0755 src/nagios-plugins-argus.* $(DESTDIR)$(PROBES_LIBEXECDIR)
-	@install -v -d $(DESTDIR)$(PROBES_LIBEXECDIR)/framework
-	@install -v -m 0644 src/framework/*.py $(DESTDIR)$(PROBES_LIBEXECDIR)/framework
-	@install -v -d $(DESTDIR)$(PROBES_VARDIR)
+	install -d $(DESTDIR)$(PROBES_LIBEXECDIR)
+	install -m 0755 src/nagios-plugins-argus.* $(DESTDIR)$(PROBES_LIBEXECDIR)
+	install -d $(DESTDIR)$(PROBES_LIBEXECDIR)/framework
+	install -m 0644 src/framework/*.py $(DESTDIR)$(PROBES_LIBEXECDIR)/framework
+	install -d $(DESTDIR)$(PROBES_VARDIR)
 
 rpm: dist
-	@mv -v $(name)-$(version).tar.gz $(name)-$(version).src.tar.gz
 	@echo "Building RPM in $(rpmbuild_dir)"
-	@mkdir -p $(rpmbuild_dir)/BUILD $(rpmbuild_dir)/RPMS \
+	mv -v $(name)-$(version).tar.gz $(name)-$(version).src.tar.gz
+	mkdir -p $(rpmbuild_dir)/BUILD $(rpmbuild_dir)/RPMS \
 		$(rpmbuild_dir)/SOURCES $(rpmbuild_dir)/SPECS \
 		$(rpmbuild_dir)/SRPMS
-	@cp -v $(name)-$(version).src.tar.gz $(rpmbuild_dir)/SOURCES/$(name)-$(version).tar.gz
-	@rpmbuild -v -ba $(spec_file) --define "_topdir $(rpmbuild_dir)"
+	cp $(name)-$(version).src.tar.gz $(rpmbuild_dir)/SOURCES/$(name)-$(version).tar.gz
+	rpmbuild -v -ba $(spec_file) --define "_topdir $(rpmbuild_dir)"
 
 
-etics: rpm
+etics: 
 	@echo "Publishing RPMs and tarballs"
-	@mkdir -p tgz RPMS
-	@cp -v $(name)-$(version).src.tar.gz tgz
-	@test ! -f $(name)-$(version).bin.tar.gz || cp -v $(name)-$(version).bin.tar.gz tgz/$(name)-$(version).tar.gz
-	@cp -rv $(rpmbuild_dir)/RPMS/* $(rpmbuild_dir)/SRPMS/* RPMS
+	mkdir -p RPMS tgz
+	test -f $(rpmbuild_dir)/RPMS/$(arch)/$(name)-$(version)-*.$(arch).rpm 
+	test -f $(rpmbuild_dir)/SRPMS/$(name)-$(version)-*.src.rpm
+	cp -r $(rpmbuild_dir)/RPMS/* $(rpmbuild_dir)/SRPMS/* RPMS
+	test -f $(name)-$(version).src.tar.gz && cp -v $(name)-$(version).src.tar.gz tgz
+	test ! -f $(name)-$(version).bin.tar.gz || cp -v $(name)-$(version).bin.tar.gz tgz/$(name)-$(version).tar.gz
