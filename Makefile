@@ -39,7 +39,7 @@ dist:
 	@mkdir $(name)-$(version)
 	@cp -rv src $(name)-$(version)
 	@cp -v Makefile $(name)-$(version)
-	@cp -v LICENSE README AUTHORS CHANGELOG $(name)-$(version)
+	@cp -v COPYRIGHT LICENSE README AUTHORS CHANGELOG $(name)-$(version)
 	@rm -f $(name)-$(version).tar.gz
 	@tar -cvzf $(name)-$(version).tar.gz $(name)-$(version)
 	@rm -fr $(name)-$(version)
