@@ -1,1 +1,5 @@
 /*.tar.gz
+/rpmbuild
+/RPMS
+/tgz
+
