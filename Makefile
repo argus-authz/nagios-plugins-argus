@@ -52,7 +52,7 @@ clean:
 install:
 	@echo "Installing Nagios probes in $(DESTDIR)$(PROBES_LIBEXECDIR)..."
 	@install -v -d $(DESTDIR)$(PROBES_LIBEXECDIR)
-	@install -v -m 0750 src/nagios-plugins-argus.* $(DESTDIR)$(PROBES_LIBEXECDIR)
+	@install -v -m 0755 src/nagios-plugins-argus.* $(DESTDIR)$(PROBES_LIBEXECDIR)
 	@install -v -d $(DESTDIR)$(PROBES_LIBEXECDIR)/framework
 	@install -v -m 0644 src/framework/*.py $(DESTDIR)$(PROBES_LIBEXECDIR)/framework
 	@install -v -d $(DESTDIR)$(PROBES_VARDIR)
