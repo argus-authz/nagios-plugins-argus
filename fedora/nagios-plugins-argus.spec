@@ -11,6 +11,7 @@ URL: https://twiki.cern.ch/twiki/bin/view/EGEE/AuthorizationFramework
 
 Source: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildArch: noarch
 
 %description
 Nagios plugins for the Argus Authorization Service (EMI)
