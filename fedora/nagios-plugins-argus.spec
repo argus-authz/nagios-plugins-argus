@@ -1,3 +1,6 @@
+# Turn off the brp-python-bytecompile script
+%global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
+
 Name: nagios-plugins-argus
 
 Version: 1.0.1
@@ -26,9 +29,6 @@ Nagios plugins for the Argus Authorization Service (EMI)
 %install
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
-# remove byte compiled files
-find $RPM_BUILD_ROOT -name '*.pyc' -exec rm -f {} ';'
-find $RPM_BUILD_ROOT -name '*.pyo' -exec rm -f {} ';'
 
 
 %clean
