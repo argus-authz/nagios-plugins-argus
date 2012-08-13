@@ -26,6 +26,10 @@ Nagios plugins for the Argus Authorization Service (EMI)
 %install
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
+# remove byte compiled files
+find $RPM_BUILD_ROOT -name '*.pyc' -exec rm -f {} ';'
+find $RPM_BUILD_ROOT -name '*.pyo' -exec rm -f {} ';'
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
