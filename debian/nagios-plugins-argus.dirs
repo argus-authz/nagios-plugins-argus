@@ -1,1 +1,2 @@
-usr/lib
+usr/libexec/grid-monitoring/probes/nagios-plugins-argus
+var/lib/grid-monitoring/nagios-plugins-argus
