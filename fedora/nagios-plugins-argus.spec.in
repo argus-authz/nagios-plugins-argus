@@ -3,8 +3,8 @@
 
 Name: nagios-plugins-argus
 
-Version: 1.0.1
-Release: 1%{?dist}
+Version: @@VERSION@@
+Release: @@RELEASE@@%{?dist}
 Summary: Nagios plugins for Argus
 
 

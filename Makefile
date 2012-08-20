@@ -24,30 +24,38 @@ PROBES_LIBEXECDIR = /usr/libexec/grid-monitoring/probes/$(PROBES_NAMESPACE)
 PROBES_VARDIR = /var/lib/grid-monitoring/$(PROBES_NAMESPACE)
 
 name=nagios-plugins-argus
-spec_file=fedora/$(name).spec
-version=$(shell grep "Version:" $(spec_file) | sed -e "s/Version://g" -e "s/[ \t]*//g")
-release=1
-arch=noarch
-rpmbuild_dir=$(shell pwd)/rpmbuild
-stage_dir=$(shell pwd)/stage
+spec_file=fedora/$(rpm_name).spec
 
+rpmbuild_dir=$(CURDIR)/rpmbuild
+debbuild_dir = $(CURDIR)/debbuild
+tmp_dir=$(CURDIR)/tmp
 
-all: install
+.PHONY: clean spec package dist rpm deb install
 
-dist:
-	@echo "Packaging sources"
-	rm -fr $(name)-$(version)
-	mkdir $(name)-$(version)
-	cp -r src $(name)-$(version)
-	cp Makefile $(name)-$(version)
-	cp COPYRIGHT LICENSE README AUTHORS CHANGELOG $(name)-$(version)
-	rm -f $(name)-$(version).tar.gz
-	tar -czf $(name)-$(version).tar.gz $(name)-$(version)
-	rm -fr $(name)-$(version)
+all: 
+	@echo "Nothing to compile ;)"
 
 clean:
-	@echo "Cleaning..."
-	rm -fr $(name)-$(version) *.tar.gz rpmbuild RPMS tgz
+	rm -rf target $(rpmbuild_dir) $(debbuild_dir) $(tmp_dir) *.tar.gz tgz RPMS $(spec_file)
+
+
+spec:
+	@echo "Setting version and release in spec file: $(version)-$(release)"
+	sed -e 's#@@VERSION@@#$(version)#g' -e 's#@@RELEASE@@#$(release)#g' $(spec_file).in > $(spec_file)
+
+
+dist: spec
+	@echo "Packaging sources"
+	test ! -d $(tmp_dir) || rm -fr $(tmp_dir)
+	mkdir -p $(tmp_dir)/$(name)-$(version)
+	cp Makefile $(tmp_dir)/$(name)-$(version)
+	cp COPYRIGHT LICENSE README.md CHANGELOG $(tmp_dir)/$(name)-$(version)
+	cp -r fedora $(tmp_dir)/$(name)-$(version)
+	cp -r debian $(tmp_dir)/$(name)-$(version)
+	cp -r src $(tmp_dir)/$(name)-$(version)
+	test ! -f $(name)-$(version).tar.gz || rm $(name)-$(version).tar.gz
+	tar -C $(tmp_dir) -czf $(name)-$(version).tar.gz $(name)-$(version)
+	rm -fr $(tmp_dir)
 
 
 install:
@@ -58,21 +66,29 @@ install:
 	install -m 0644 src/framework/*.py $(DESTDIR)$(PROBES_LIBEXECDIR)/framework
 	install -d $(DESTDIR)$(PROBES_VARDIR)
 
-rpm: dist
-	@echo "Building RPM in $(rpmbuild_dir)"
-	mv -v $(name)-$(version).tar.gz $(name)-$(version).src.tar.gz
-	mkdir -p $(rpmbuild_dir)/BUILD $(rpmbuild_dir)/RPMS \
-		$(rpmbuild_dir)/SOURCES $(rpmbuild_dir)/SPECS \
-		$(rpmbuild_dir)/SRPMS
+rpm:
+	test -f $(name)-$(version).tar.gz || make dist
+	@echo "Building RPM and SRPM in $(rpmbuild_dir)"
+	mv $(name)-$(version).tar.gz $(name)-$(version).src.tar.gz
+	mkdir -p $(rpmbuild_dir)/BUILD $(rpmbuild_dir)/RPMS $(rpmbuild_dir)/SOURCES $(rpmbuild_dir)/SPECS $(rpmbuild_dir)/SRPMS
 	cp $(name)-$(version).src.tar.gz $(rpmbuild_dir)/SOURCES/$(name)-$(version).tar.gz
-	rpmbuild -v -ba $(spec_file) --define "_topdir $(rpmbuild_dir)"
+	rpmbuild --nodeps -v -ba $(spec_file) --define "_topdir $(rpmbuild_dir)"
 
 
-etics: 
-	@echo "Publishing RPMs and tarballs"
-	mkdir -p RPMS tgz
-	test -f $(rpmbuild_dir)/RPMS/$(arch)/$(name)-$(version)-*.$(arch).rpm 
+deb:
+	test -f $(name)-$(version).tar.gz || make dist
+	@echo "Building Debian package in $(debbuild_dir)"
+	mv $(name)-$(version).tar.gz $(name)-$(version).src.tar.gz
+	mkdir -p $(debbuild_dir)
+	cp $(name)-$(version).src.tar.gz $(debbuild_dir)/$(name)_$(version).orig.tar.gz
+	tar -C $(debbuild_dir) -xzf $(name)-$(version).src.tar.gz
+	cd $(debbuild_dir)/$(name)-$(version) && debuild -us -uc 
+
+
+etics:
+	@echo "Publish RPMS, SRPMS and tarball"
 	test -f $(rpmbuild_dir)/SRPMS/$(name)-$(version)-*.src.rpm
+	mkdir -p tgz RPMS
+	cp target/*.tar.gz tgz
 	cp -r $(rpmbuild_dir)/RPMS/* $(rpmbuild_dir)/SRPMS/* RPMS
-	test -f $(name)-$(version).src.tar.gz && cp -v $(name)-$(version).src.tar.gz tgz
-	test ! -f $(name)-$(version).bin.tar.gz || cp -v $(name)-$(version).bin.tar.gz tgz/$(name)-$(version).tar.gz
+
