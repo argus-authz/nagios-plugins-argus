@@ -55,7 +55,7 @@ dist: spec
 	cp Makefile $(tmp_dir)/$(name)-$(version)
 	cp COPYRIGHT LICENSE README.md CHANGELOG $(tmp_dir)/$(name)-$(version)
 	cp -r fedora $(tmp_dir)/$(name)-$(version)
-	#cp -r debian $(tmp_dir)/$(name)-$(version)
+	cp -r debian $(tmp_dir)/$(name)-$(version)
 	cp -r src $(tmp_dir)/$(name)-$(version)
 	test ! -f $(name)-$(version).tar.gz || rm $(name)-$(version).tar.gz
 	tar -C $(tmp_dir) -czf $(name)-$(version).tar.gz $(name)-$(version)

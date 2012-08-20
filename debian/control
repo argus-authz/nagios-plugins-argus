@@ -1,0 +1,23 @@
+Source: nagios-plugins-argus
+Priority: extra
+Maintainer: Valery Tschopp <valery.tschopp@switch.ch>
+Build-Depends: debhelper (>= 7.0.50~)
+Standards-Version: 3.8.4
+Section: libs
+Homepage: <insert the upstream URL, if relevant>
+#Vcs-Git: git://git.debian.org/collab-maint/nagios-plugins-argus.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/nagios-plugins-argus.git;a=summary
+
+Package: nagios-plugins-argus-dev
+Section: libdevel
+Architecture: any
+Depends: nagios-plugins-argusBROKEN (= ${binary:Version})
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>
+
+Package: nagios-plugins-argusBROKEN
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>
