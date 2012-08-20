@@ -19,12 +19,16 @@
 #     Valery Tschopp  <valery.tschopp@switch.ch>
 #############################################################################
 
-PROBES_NAMESPACE = nagios-plugins-argus
+name=nagios-plugins-argus
+
+version=1.0.1
+release=1
+
+PROBES_NAMESPACE = $(name)
 PROBES_LIBEXECDIR = /usr/libexec/grid-monitoring/probes/$(PROBES_NAMESPACE)
 PROBES_VARDIR = /var/lib/grid-monitoring/$(PROBES_NAMESPACE)
 
-name=nagios-plugins-argus
-spec_file=fedora/$(rpm_name).spec
+spec_file=fedora/$(name).spec
 
 rpmbuild_dir=$(CURDIR)/rpmbuild
 debbuild_dir = $(CURDIR)/debbuild
