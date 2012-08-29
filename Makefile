@@ -41,6 +41,9 @@ deb_dir=$(CURDIR)/deb
 clean:
 	rm -rf target $(rpmbuild_dir) $(debbuild_dir) $(tmp_dir) *.tar.gz $(tgz_dir) RPMS $(deb_dir) $(spec_file)
 
+all: 
+	@echo "Nothing to compile ;)"
+	@echo "make DESTDIR=<destdir> install"
 
 spec:
 	@echo "Setting version and release in spec file: $(version)-$(release)"
