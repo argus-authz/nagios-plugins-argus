@@ -32,16 +32,14 @@ spec_file=fedora/$(name).spec
 
 rpmbuild_dir=$(CURDIR)/rpmbuild
 debbuild_dir = $(CURDIR)/debbuild
-tgz_dir= $(CURDIR)/tgz
 tmp_dir=$(CURDIR)/tmp
+tgz_dir= $(CURDIR)/tgz
+deb_dir=$(CURDIR)/deb
 
-.PHONY: clean spec package dist rpm deb install
-
-all: 
-	@echo "Nothing to compile ;)"
+.PHONY: clean spec dist package install srpm rpm deb deb-src
 
 clean:
-	rm -rf target $(rpmbuild_dir) $(debbuild_dir) $(tmp_dir) *.tar.gz tgz RPMS $(spec_file)
+	rm -rf target $(rpmbuild_dir) $(debbuild_dir) $(tmp_dir) *.tar.gz $(tgz_dir) RPMS $(deb_dir) $(spec_file)
 
 
 spec:
@@ -89,19 +87,28 @@ rpm: pre_rpmbuild
 	rpmbuild --nodeps -v -ba $(spec_file) --define "_topdir $(rpmbuild_dir)"
 
 
-deb:
+pre_debbuild:
 	test -f $(name)-$(version).tar.gz || make dist
-	@echo "Building Debian package in $(debbuild_dir)"
+	@echo "Prepare for Debian building in $(debbuild_dir)"
 	mv $(name)-$(version).tar.gz $(name)-$(version).src.tar.gz
 	mkdir -p $(debbuild_dir)
 	cp $(name)-$(version).src.tar.gz $(debbuild_dir)/$(name)_$(version).orig.tar.gz
 	tar -C $(debbuild_dir) -xzf $(name)-$(version).src.tar.gz
+
+
+deb: pre_debbuild
+	@echo "Building Debian package in $(debbuild_dir)"
 	cd $(debbuild_dir)/$(name)-$(version) && debuild -us -uc 
+
+
+deb-src: pre_debbuild
+	@echo "Building Debian source package in $(debbuild_dir)"
+	cd $(debbuild_dir) && dpkg-source -b $(name)-$(version)
 
 
 etics:
 	@echo "Publish SRPM/RPM/Debian/tarball"
-	mkdir -p RPMS $(tgz_dir)
+	mkdir -p RPMS $(tgz_dir) $(deb_dir)
 	test ! -f $(name)-$(version).src.tar.gz || cp -v $(name)-$(version).src.tar.gz $(tgz_dir)
 	test ! -f $(rpmbuild_dir)/SRPMS/$(name)-$(version)-*.src.rpm || cp -v $(rpmbuild_dir)/SRPMS/$(name)-$(version)-*.src.rpm RPMS
 	if [ -f $(rpmbuild_dir)/RPMS/*/$(name)-$(version)-*.rpm ] ; then \
@@ -114,3 +121,17 @@ etics:
 		mv -v $(name)-$(version).tar.gz $(tgz_dir) ; \
 		rm -fr $(tmp_dir) ; \
 	fi
+	test ! -f $(debbuild_dir)/$(name)_$(version)-*.dsc || cp -v $(debbuild_dir)/$(name)_$(version)-*.dsc $(deb_dir)
+	test ! -f $(debbuild_dir)/$(name)_$(version)-*.debian.tar.gz || cp -v $(debbuild_dir)/$(name)_$(version)-*.debian.tar.gz $(deb_dir)
+	test ! -f $(debbuild_dir)/$(name)_$(version).orig.tar.gz || cp -v $(debbuild_dir)/$(name)_$(version).orig.tar.gz $(deb_dir)
+	if [ -f $(debbuild_dir)/$(name)_$(version)-*.deb ] ; then \
+		cp -v $(debbuild_dir)/$(name)_$(version)-*.deb $(deb_dir) ; \
+		test ! -d $(tmp_dir) || rm -fr $(tmp_dir) ; \
+		mkdir -p $(tmp_dir) ; \
+		dpkg -x $(debbuild_dir)/$(name)_$(version)-*.deb $(tmp_dir) ; \
+		cd $(tmp_dir) ; \
+		tar -C $(tmp_dir) -czf $(name)-$(version).tar.gz * ; \
+		mv -v $(name)-$(version).tar.gz $(tgz_dir) ; \
+		rm -fr $(tmp_dir) ; \
+	fi
+
