@@ -1,5 +1,8 @@
 Nagio probes for the Argus Authorization Service
 ------------------------------------------------
+Version 1.1.0:
+* Packaging moved to separate projects.
+
 Version 1.0.1:
 * Minor changes.
 * Self managed packaging (RPM) with a spec file.

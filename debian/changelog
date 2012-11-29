@@ -1,5 +1,0 @@
-nagios-plugins-argus (1.0.1-1) unstable; urgency=low
-
-  * Initial release for Debian (Closes: #23482)
-
- -- Valery Tschopp <valery.tschopp@switch.ch>  Mon, 20 Aug 2012 17:10:37 +0200

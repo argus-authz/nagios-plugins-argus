@@ -18,7 +18,7 @@
 #     Joel Casutt     - joel.casutt@switch.ch
 #############################################################################
 
-__VERSION__ = "1.0.1"
+__VERSION__ = "1.1.0"
 
 def getVersion():
    return __VERSION__
