@@ -22,10 +22,16 @@ Created on 4/jan/2012
 
 @author: joelcasutt
 '''
-from AbstractProbe import ArgusAbstractProbe
-from HTTPSHandler import HTTPSClientAuthenticationHandler
-from urllib2 import HTTPError, URLError
-import urllib2
+from .AbstractProbe import ArgusAbstractProbe
+from .HTTPSHandler import HTTPSClientAuthenticationHandler
+import sys
+if sys.version_info[0]>2:
+    from urllib.error import HTTPError, URLError
+    import urllib.request as urllib2
+else:
+    from urllib2 import HTTPError, URLError
+    import urllib2
+import ssl
 
 class ArgusProbe( ArgusAbstractProbe ):
 
@@ -36,6 +42,10 @@ class ArgusProbe( ArgusAbstractProbe ):
     return the status dictionary
     """
     def getStatus( self ):
+        if sys.version_info[0]>2 or sys.version_info[1]>7 or (sys.version_info[1]==7 and sys.version_info[2]>=5):
+            ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+        else:
+            ctx = None
         
         if self.isHTTPSClientAuthNenabled():
         
@@ -44,25 +54,32 @@ class ArgusProbe( ArgusAbstractProbe ):
                 
             cert_handler = HTTPSClientAuthenticationHandler(key=self.options.key, 
                                                             cert=self.options.cert,
-                                                            timeout=self.options.timeout) 
-            opener = urllib2.build_opener(cert_handler)
-            urllib2.install_opener(opener)
+                                                            timeout=self.options.timeout,
+                                                            context=ctx)
+        else:
+            if (ctx==None):
+                cert_handler = urllib2.HTTPSHandler()
+            else:
+                cert_handler = urllib2.HTTPSHandler(context=ctx)
+
+        opener = urllib2.build_opener(cert_handler)
+        urllib2.install_opener(opener)
         try:
             if self.options.verbose:
-                print "Contacting %s..." % self.url
+                print("Contacting %s..." % self.url)
             f = urllib2.urlopen(self.url)
-        except HTTPError, e:
-            self.nagios_critical("Error: %s: %s" % (self.url, e))   
-        except URLError, e:
+        except HTTPError as e:
+            self.nagios_critical("Error: %s: %s" % (self.url, e))
+        except URLError as e:
             self.nagios_critical("Error: %s: %s" % (self.url, e))
         status = dict()
         for line in f:
-            (key, value) = line.rsplit('\n')[0].split(": ")
+            (key, value) = line.decode('utf8').rsplit('\n')[0].split(": ")
             status[key] = value
         return status
         
     def getPickleFile( self ):
-        print "no pickle-file needed for this service (Status)"
+        print("no pickle-file needed for this service (Status)")
     
     """
     Exits with NAGIOS_CRITICAL if file doesn't exist or is not readable
@@ -70,5 +87,5 @@ class ArgusProbe( ArgusAbstractProbe ):
     def file_exists(self, file):
         try:
             open(file, "r")
-        except IOError, e:
+        except IOError as e:
             self.nagios_critical(e)        

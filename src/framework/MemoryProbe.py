@@ -22,8 +22,8 @@ Created on 4/jan/2012
 
 @author: joelcasutt
 '''
-from Probe import ArgusProbe
-from AbstractProbe import ArgusAbstractProbe
+from .Probe import ArgusProbe
+from .AbstractProbe import ArgusAbstractProbe
 from optparse import OptionParser, OptionGroup
 
 class ArgusMemoryProbe( ArgusProbe ):
@@ -70,16 +70,18 @@ class ArgusMemoryProbe( ArgusProbe ):
         self.setWarningMemoryTreshold(self.options.mem_warn)
         self.setCriticalMemoryTreshold(self.options.mem_crit)
         __current_used_memory = int(status['UsedMemory'].split()[0]) / 1048576
-        perfdata = " | MemoryUsage=" + str(__current_used_memory) + "MB;" + \
-                   str(self.getWarningMemoryTreshold()) + ";" + str(self.getCriticalMemoryTreshold())
+        perfdata = " | MemoryUsage=%dMB;%s;%s" \
+            % (__current_used_memory,
+               str(self.getWarningMemoryTreshold()),
+               str(self.getCriticalMemoryTreshold()))
         if not status['Service'] == self.getServiceName():
             self.nagios_critical("the answering service is not a %s" % self.getServiceName())
         if int(self.getWarningMemoryTreshold())>=int(self.getCriticalMemoryTreshold()):
             self.nagios_critical("critical: the threshold for warning (%sMB) is equal or higher than the threshold for critical (%sMB)" 
                                  % (self.getWarningMemoryTreshold(), self.getCriticalMemoryTreshold()))
         if __current_used_memory <= int(self.getWarningMemoryTreshold()):
-            self.nagios_ok(status['Service'] + " " + status['ServiceVersion'] + ": Used memory "  + \
-                           str(__current_used_memory) + "MB" + perfdata)
+            self.nagios_ok(status['Service'] + " " + status['ServiceVersion'] + ": Used memory %dMB%s" \
+                           % (__current_used_memory, perfdata))
         elif __current_used_memory <= int(self.getCriticalMemoryTreshold()) and \
              __current_used_memory > int(self.getWarningMemoryTreshold()):
             self.nagios_warning("warning: used memory (%dMB) higher than warning threshold (%sMB)" \

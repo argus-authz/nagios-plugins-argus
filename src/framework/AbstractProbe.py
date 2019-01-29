@@ -23,13 +23,16 @@ Created on 4/jan/2012
 @author: joelcasutt
 '''
 from optparse import OptionParser, OptionGroup
-from sys import stderr, exit
-from urlparse import urlparse
+from sys import stderr, exit, version_info
+if version_info[0]>2:
+    from urllib.parse import urlparse
+else:
+    from urlparse import urlparse
 import sys
 import signal
 import inspect
 
-import Version
+from . import Version
 
 class ArgusAbstractProbe( object ):
     """
@@ -118,7 +121,7 @@ class ArgusAbstractProbe( object ):
 
     # return Values for Nagios
     def nagios_exit(self, exit_code, msg):
-        print msg
+        print(msg)
         exit(exit_code)
         
     def nagios_ok(self,msg):

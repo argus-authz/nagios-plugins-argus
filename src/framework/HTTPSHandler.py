@@ -22,36 +22,35 @@ Created on 4/jan/2012
 
 @author: joelcasutt
 '''
-import urllib2
-import httplib
-import socket
 import sys
-from AbstractProbe import ArgusAbstractProbe
+if sys.version_info[0]>2:
+    import urllib.request as urllib2
+    import http.client as httplib
+else:
+    import urllib2
+    import httplib
+import socket
+from .AbstractProbe import ArgusAbstractProbe
 
 class HTTPSClientAuthenticationHandler( urllib2.HTTPSHandler ):
 
     """
     key and cert MUST exists
     """
-    def __init__(self, key, cert, timeout):
+    def __init__(self, key, cert, timeout, context):
         urllib2.HTTPSHandler.__init__(self)
         self.key = key
         self.cert = cert
         self.timeout = timeout
+        self.ctx = context
         socket.setglobaltimeout = timeout
  
     def https_open(self, req):
         return self.do_open(self.getConnection, req)
     
-    '''
-    There seems to be a change in the API between python 2.4 and more recent versions of python.
-    The getConnection function of the module urllib2 is taking a supplementary argument (timeout)
-    in Versions newer than 2.4.
-    '''
-    if sys.version_info[1] < 5:
-        def getConnection(self, host):
-            return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
-    else:
-        def getConnection(self, host, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
-            return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
+    def getConnection(self, host, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
+	if (self.ctx==None):
+	    return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
+	else:
+	    return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert, context=self.ctx)
 

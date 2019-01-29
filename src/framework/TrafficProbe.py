@@ -26,8 +26,8 @@ import pickle
 import time
 import os
 from os import path, makedirs
-from Probe import ArgusProbe
-from AbstractProbe import ArgusAbstractProbe
+from .Probe import ArgusProbe
+from .AbstractProbe import ArgusAbstractProbe
 from optparse import OptionParser, OptionGroup
 
 class ArgusTrafficProbe( ArgusProbe ):
@@ -77,20 +77,20 @@ class ArgusTrafficProbe( ArgusProbe ):
     def saveCurrentState( self, state ):
         if not path.exists(self.getPickleDir()):
             try:
-                makedirs(self.getPickleDir(), 0750)
-            except Exception, e:
+                makedirs(self.getPickleDir(), 0o750)
+            except Exception as e:
                 self.nagios_warning("could not create temp-directory (%s): %s" 
                                     % (self.getPickleDir(), e))
         try:
             pickle.dump( state, open( self.getPicklePath(), "wb" ) )
-        except Exception, e:
+        except Exception as e:
             self.nagios_warning("could not dump current state to temporary file (%s): %s" 
                                 % (self.getPicklePath(), e))
         
     def getLastState( self ):
         try:
             return pickle.load( open( self.getPicklePath(), "rb" ) )
-        except Exception, e:
+        except Exception as e:
             self.nagios_warning("could not read last state to temporary file (%s): %s" 
                                 % (self.getPicklePath(), e))
     

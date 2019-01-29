@@ -22,8 +22,8 @@ Created on 4/jan/2012
 
 @author: joelcasutt
 '''
-from Probe import ArgusProbe
-from AbstractProbe import ArgusAbstractProbe
+from .Probe import ArgusProbe
+from .AbstractProbe import ArgusAbstractProbe
 
 class ArgusStatusProbe( ArgusProbe ):
 
