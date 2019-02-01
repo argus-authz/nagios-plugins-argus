@@ -8,7 +8,7 @@ These probes work exclusively for Argus version 1.5.0 and onward
 Documentation
 -------------
 The complete documentation of the probes can be found online:
-    https://twiki.cern.ch/twiki/bin/view/EGEE/ArgusEMINagiosProbes
+    https://argus-documentation.readthedocs.io/en/stable/monitoring/emi_nagios_probes.html
 
 
 Installation
